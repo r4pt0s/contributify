@@ -33,7 +33,6 @@ run(); */
 
 async function main() {
   const status = await git.status();
-  const commitHistory = await git.log();
 
   try {
     await git.catFile(["-s", "master:CONTRIBUTORS.md"]);
@@ -56,6 +55,7 @@ async function main() {
 
 async function createAndCommitFile() {
   // create file, add current author of PR to newly created CONTRIBUTORS.md file
+  const commitHistory = await git.log();
   const { author_email, author_name } = commitHistory.all[0];
   console.log("CONTRIBUTORS FILE DOESNT EXITSTS");
   const file = path.join(__dirname, filename);
