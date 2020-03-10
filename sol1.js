@@ -17,35 +17,12 @@ try {
   const user = payload.sender;
 
   console.log("user who made the pr: ", user);
+  main(user);
 } catch (error) {
   core.setFailed(error.message);
 }
 
-/* async function run() {
-  // This should be a token with access to your repository scoped in as a secret.
-  // The YML workflow will need to set myToken with the GitHub Secret Token
-  // myToken: ${{ secrets.GITHUB_TOKEN }}
-  // https://help.github.com/en/actions/automating-your-workflow-with-github-actions/authenticating-with-the-github_token#about-the-github_token-secret
-  const myToken = process.env.GITHUB_TOKEN //core.getInput("GITHUB_TOKEN");
-
-  const octokit = new github.GitHub(myToken);
-
-  const { data: pullRequest } = await octokit.pulls.get({
-    owner: process.env.GITHUB_ACTOR,
-    repo: "rest.js",
-   
-  });
-
-  console.log(pullRequest);
-}
-
-run(); */
-
-async function main() {
-  const status = await git.status();
-
-  const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
-
+async function main(userData) {
   try {
     await git.catFile(["-s", "master:CONTRIBUTORS.md"]);
     // file already exists
@@ -53,7 +30,7 @@ async function main() {
     console.log(master);
   } catch (err) {
     //does not exist
-    await createAndCommitFile();
+    await createAndCommitFile(userData.login, userData.html_url);
   }
   //console.log(commitHistory);
 
@@ -66,30 +43,19 @@ async function main() {
   } */
 }
 
-async function createAndCommitFile() {
+async function createAndCommitFile(loginName, profileUrl) {
   // create file, add current author of PR to newly created CONTRIBUTORS.md file
-  const commitHistory = await git.log();
-  const { author_email, author_name } = commitHistory.all[0];
   console.log("CONTRIBUTORS FILE DOESNT EXITSTS");
   const file = path.join(__dirname, filename);
 
-  console.log(commitHistory.all[2]);
-  console.log("CURRENT COMMIT ID", process.env.GITHUB_SHA);
-  console.log("AUTHOR AND MAIL: ", author_email, author_name);
+  fs.writeFileSync(file, `- [@${loginName}](${profileUrl})`);
 
-  fs.writeFileSync(
-    file,
-    `- [@${author_name}](https://github.com/${author_name}/)`
-  );
+  //git add, git commit the changes
   git.addConfig("user.name", process.env.GITHUB_ACTOR);
   git.addConfig("user.email", "");
   git.add([file]);
-  git.commit("committed CONTRIBUTORS.md file", [file], {
+  git.commit("committed new CONTRIBUTORS.md file", [file], {
     "--author": '"CONTRIBUTIFY BOT <contri@test.com>"'
   });
   git.push(["-u", "origin", "master"], () => console.log("done"));
-
-  //git add, git commit the changes
 }
-
-//main();
