@@ -12,6 +12,7 @@ const glob = require("@actions/glob");
 const exec = require("@actions/exec");
 
 const filename = "CONTRIBUTORS.md";
+const file = path.join(__dirname, filename);
 
 try {
   const payload = github.context.payload;
@@ -25,7 +26,7 @@ try {
 }
 
 async function main(userData) {
-  await exec.exec("git checkout master");
+  // maybe not necassary => await exec.exec("git checkout master");
   const patterns = ["**/CONTRIBUTORS.md"];
   const globber = await glob.create(patterns.join("\n"));
   const files = await globber.glob();
@@ -34,16 +35,21 @@ async function main(userData) {
   if (files.length > 0) {
     // file already exists
     console.log("FILE EXISTS", "CHECKING ENTRIES IF USER IS ALREADY IN....");
+    console.log(checkIfContributorExists(userData.login));
   }
   await createAndCommitFile(userData.login, userData.html_url);
 }
 
-async function addAndCommitNewContributor(loginName, profileUrl) {}
+async function checkIfContributorExists(loginName) {
+  const fileContents = fs.readFileSync(file, "utf-8");
+  console.log(fileContents);
+
+  return fileContents.includes(loginName);
+}
 
 async function createAndCommitFile(loginName, profileUrl) {
   // create file, add current author of PR to newly created CONTRIBUTORS.md file
   console.log("CONTRIBUTORS FILE DOESNT EXITSTS");
-  const file = path.join(__dirname, filename);
 
   fs.appendFileSync(file, `\n- [@${loginName}](${profileUrl})`);
 
