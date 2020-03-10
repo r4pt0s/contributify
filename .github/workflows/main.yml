@@ -19,7 +19,7 @@ jobs:
       - name: 'Install NPM depencencies'
         run: npm install
       - name: "Run code and check for CONTRIBUTORS.md file"
-        run: node sol1.js
+        run: node dist/index.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
