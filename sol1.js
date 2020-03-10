@@ -6,7 +6,7 @@ const fs = require("fs");
 const path = require("path");
 //const git = simpleGit(process.env.GITHUB_WORKSPACE);
 const git = simpleGit();
-const github = require("@actions/github");
+const octokit = require("@actions/github");
 const core = require("@actions/core");
 
 const filename = "CONTRIBUTORS.md";
@@ -34,40 +34,49 @@ run(); */
 async function main() {
   const status = await git.status();
   const commitHistory = await git.log();
-  const { author_email, author_name } = commitHistory.all[0];
-  //console.log(status);
-  const hasContri = status.files.filter(file =>
-    file.path.includes("CONTRIBUTORS")
-  );
+
+  try {
+    await git.catFile(["-s", "master:CONTRIBUTORS.md"]);
+    // file already exists
+    console.log(master);
+  } catch (err) {
+    //does not exist
+    await createAndCommitFile();
+  }
   //console.log(commitHistory);
 
-  if (hasContri.length > 0) {
+  /*if (hasContri.length > 0) {
     // Do file editing and git add, git commit the changes
     //fs.writeFileSync('./')
     console.log("CONTRIBUTORS FILE EXITSTS ALREADY");
   } else {
-    // create file, add current author of PR and add to readme.md file
-    console.log("CONTRIBUTORS FILE DOESNT EXITSTS");
-    const file = path.join(__dirname, filename);
+    
+  } */
+}
 
-    console.log(commitHistory.all[0]);
-    console.log("CURRENT COMMIT ID", process.env.GITHUB_SHA);
-    console.log("AUTHOR AND MAIL: ", author_email, author_name);
+async function createAndCommitFile() {
+  // create file, add current author of PR to newly created CONTRIBUTORS.md file
+  const { author_email, author_name } = commitHistory.all[0];
+  console.log("CONTRIBUTORS FILE DOESNT EXITSTS");
+  const file = path.join(__dirname, filename);
 
-    fs.writeFileSync(
-      file,
-      `- [@${author_name}](https://github.com/${author_name}/)`
-    );
-    git.addConfig("user.name", process.env.GITHUB_ACTOR);
-    git.addConfig("user.email", "");
-    git.add([file]);
-    git.commit("committed CONTRIBUTORS.md file", [file], {
-      "--author": '"CONTRIBUTIFY BOT <contri@test.com>"'
-    });
-    git.push(["-u", "origin", "master"], () => console.log("done"));
+  console.log(commitHistory.all[2]);
+  console.log("CURRENT COMMIT ID", process.env.GITHUB_SHA);
+  console.log("AUTHOR AND MAIL: ", author_email, author_name);
 
-    //git add, git commit the changes
-  }
+  fs.writeFileSync(
+    file,
+    `- [@${author_name}](https://github.com/${author_name}/)`
+  );
+  git.addConfig("user.name", process.env.GITHUB_ACTOR);
+  git.addConfig("user.email", "");
+  git.add([file]);
+  git.commit("committed CONTRIBUTORS.md file", [file], {
+    "--author": '"CONTRIBUTIFY BOT <contri@test.com>"'
+  });
+  git.push(["-u", "origin", "master"], () => console.log("done"));
+
+  //git add, git commit the changes
 }
 
 main();
