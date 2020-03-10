@@ -19,13 +19,13 @@ try {
   const user = payload.sender;
 
   console.log("user who made the pr: ", user);
-  await exec.exec("git checkout master");
   main(user);
 } catch (error) {
   core.setFailed(error.message);
 }
 
 async function main(userData) {
+  await exec.exec("git checkout master");
   const patterns = ["**/CONTRIBUTORS.md"];
   const globber = await glob.create(patterns.join("\n"));
   const files = await globber.glob();
