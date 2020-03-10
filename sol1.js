@@ -30,14 +30,19 @@ async function main(userData) {
   const patterns = ["**/CONTRIBUTORS.md"];
   const globber = await glob.create(patterns.join("\n"));
   const files = await globber.glob();
+  let isUserInFile = null;
 
   console.log(files);
   if (files.length > 0) {
     // file already exists
+    isUserInFile = checkIfContributorExists(userData.login);
+
     console.log("FILE EXISTS", "CHECKING ENTRIES IF USER IS ALREADY IN....");
-    console.log(checkIfContributorExists(userData.login));
   }
-  await createAndCommitFile(userData.login, userData.html_url);
+
+  if (!isUserInFile) {
+    await createAndCommitFile(userData.login, userData.html_url);
+  }
 }
 
 async function checkIfContributorExists(loginName) {
@@ -57,7 +62,7 @@ async function createAndCommitFile(loginName, profileUrl) {
   git.addConfig("user.name", process.env.GITHUB_ACTOR);
   git.addConfig("user.email", "");
   git.add([file]);
-  git.commit("committed new CONTRIBUTORS.md file", [file], {
+  git.commit(`added ${loginName} to ${filename}`, [file], {
     "--author": '"CONTRIBUTIFY BOT <contri@test.com>"'
   });
   git.push(["-u", "origin", "master"], () => console.log("done"));
