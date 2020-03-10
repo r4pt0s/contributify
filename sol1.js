@@ -24,7 +24,10 @@ try {
 
 async function main(userData) {
   try {
-    await git.catFile(["-s", "master:CONTRIBUTORS.md"]);
+    await git.catFile([
+      "-s",
+      `${process.env.GITHUB_WORKSPACE}/tree/master:CONTRIBUTORS.md`
+    ]);
     // file already exists
     await createAndCommitFile(userData.login, userData.html_url);
     console.log(master);
