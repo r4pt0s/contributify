@@ -1,199 +1,66 @@
 require("dotenv").config();
 
-const git = require("nodegit");
-//const testRepo = "https://github.com/r4pt0s/contributify";
-const path = require("path");
+const simpleGit = require("simple-git/promise");
 const fs = require("fs");
-const testRepo = process.env.GITHUB_WORKSPACE;
+const path = require("path");
+const git = simpleGit();
+const github = require("@actions/github");
+const core = require("@actions/core");
+const glob = require("@actions/glob");
 
-const nameVariations = ["contributors"];
+const filename = "CONTRIBUTORS.md";
+const file = path.join(__dirname, filename);
 
-addFile();
-// This example opens a certain file, `README.md`, at a particular commit,
-// and prints the first 10 lines as well as some metadata.
-/* var _entry;
-git.Repository.open(path.resolve(__dirname, "./.git"))
-  .then(function(repo) {
-    return repo.getCommit(process.env.GITHUB_SHA);
-  })
-  .then(function(commit) {
-    let getFile = null;
-    let blob = "";
-
-    try {
-      getFile = commit.getEntry("CONTRIBUTORS.md");
-      return getFile;
-    } catch (err) {
-      console.log(err);
-      return addFile().done();
-    }
-
-    console.log("getFILE: ", getFile);
-  })
-  .then(function(entry) {
-    console.log(entry);
-    _entry = entry;
-    return _entry.getBlob();
-  })
-  .then(function(blob) {
-    console.log(_entry.name(), _entry.sha(), blob.rawsize() + "b");
-    console.log("========================================================\n\n");
-    var firstTenLines = blob
-      .toString()
-      .split("\n")
-      .slice(0, 10)
-      .join("\n");
-    console.log(firstTenLines);
-    console.log("...");
-  })
-  .done(); */
-
-function addFile() {
-  var path = require("path");
-  var fse = require("fs-extra");
-  var fileName = "CONTRIBUTORS.md";
-  var fileContent = "- TEST";
-  var directoryName = "./";
-  /**
-   * This example creates a certain file `newfile.txt`, adds it to the git
-   * index and commits it to head. Similar to a `git add newfile.txt`
-   * followed by a `git commit`
-   **/
-
-  var repo;
-  var index;
-  var oid;
-
-  git.Repository.open(process.env.GITHUB_WORKSPACE)
-    .then(function(repoResult) {
-      repo = repoResult;
-      return fse.ensureDir(path.join(repo.workdir(), directoryName));
-    })
-    .then(function() {
-      return fse.writeFile(path.join(repo.workdir(), fileName), fileContent);
-    })
-    .then(function() {
-      return fse.writeFile(
-        path.join(repo.workdir(), directoryName, fileName),
-        fileContent
-      );
-    })
-    .then(function() {
-      return repo.refreshIndex();
-    })
-    .then(function(indexResult) {
-      index = indexResult;
-    })
-    .then(function() {
-      // this file is in the root of the directory and doesn't need a full path
-      return index.addByPath(fileName);
-    })
-    .then(function() {
-      // this file is in a subdirectory and can use a relative path
-      return index.addByPath(path.posix.join(directoryName, fileName));
-    })
-    .then(function() {
-      // this will write both files to the index
-      return index.write();
-    })
-    .then(function() {
-      return index.writeTree();
-    })
-    .then(function(oidResult) {
-      oid = oidResult;
-      return git.Reference.nameToId(repo, "HEAD");
-    })
-    .then(function(head) {
-      return repo.getCommit(head);
-    })
-    .then(function(parent) {
-      var author = git.Signature.now("CONTRIBUTIFY BOT", "contri@test.com");
-      var committer = git.Signature.now("CONTRIBUTIFY BOT", "contri@test.com");
-
-      return repo.createCommit("HEAD", author, committer, "message", oid, [
-        parent
-      ]);
-    })
-    .done(function(commitId) {
-      console.log("New Commit: ", commitId);
-    });
+try {
+  const payload = github.context.payload;
+  // user who made the pr
+  const user = payload.sender;
+  main(user);
+} catch (error) {
+  core.setFailed(error.message);
 }
 
-/* git
-  .Clone(testRepo, "./tmp")
-  // Look up this known commit.
-  .then(function(repo) {
-    // Use a known commit sha from this repository.
-    console.log(repo.getMasterCommit());
-    return repo.getMasterCommit();
-  })
-  // Look up a specific file within that commit.
-  .then(function(commit) {
-    return commit.getEntry("README.md");
-  })
-  // Get the blob contents from the file.
-  .then(function(entry) {
-    // Patch the blob to contain a reference to the entry.
-    return entry.getBlob().then(function(blob) {
-      blob.entry = entry;
-      return blob;
-    });
-  })
-  // Display information about the blob.
-  .then(function(blob) {
-    // Show the path, sha, and filesize in bytes.
-    console.log(blob.entry.path() + blob.entry.sha() + blob.rawsize() + "b");
+async function main(userData) {
+  const patterns = ["**/CONTRIBUTORS.md"];
+  const globber = await glob.create(patterns.join("\n"));
+  const files = await globber.glob();
+  let isUserInFile = null;
 
-    // Show a spacer.
-    console.log(Array(72).join("=") + "\n\n");
+  console.log(files);
+  if (files.length > 0) {
+    // file already exists
+    console.log("FILE EXISTS", "CHECKING ENTRIES IF USER IS ALREADY IN....");
+    console.log("=================================");
+    isUserInFile = checkIfContributorExists(userData.login);
+  }
 
-    // Show the entire file.
-    console.log(String(blob));
-  })
-  .catch(function(err) {
-    console.log(err);
-  }); */
-/* 
-// Open the repository directory.
-git.Repository.open(testRepo)
-  // Open the master branch.
-  .then(function(repo) {
-    console.log("I OPENED THE REPO");
-    return repo.getMasterCommit();
-  })
-  // Display information about commits on master.
-  .then(function(firstCommitOnMaster) {
-    // Create a new history event emitter.
-    var history = firstCommitOnMaster.history();
+  if (!isUserInFile) {
+    await createAndCommitFile(userData.login, userData.html_url);
+  }
+}
 
-    console.log(history);
-    // Create a counter to only show up to 9 entries.
-    var count = 0;
+async function checkIfContributorExists(loginName) {
+  const fileContents = fs.readFileSync(file, "utf-8");
 
-    // Listen for commit events from the history.
-    history.on("commit", function(commit) {
-      // Disregard commits past 9.
-      if (++count >= 9) {
-        return;
-      }
+  return fileContents.includes(loginName);
+}
 
-      // Show the commit sha.
-      console.log("commit " + commit.sha());
+async function createAndCommitFile(loginName, profileUrl) {
+  // create file, add current author of PR to newly created CONTRIBUTORS.md file
+  console.log("CONTRIBUTORS FILE DOESNT EXITSTS");
+  console.log("=================================");
 
-      // Store the author object.
-      var author = commit.author();
+  fs.appendFileSync(file, `\n- [@${loginName}](${profileUrl})`);
 
-      // Display author information.
-      console.log("Author:\t" + author.name() + " <" + author.email() + ">");
-
-      // Show the commit date.
-      console.log("Date:\t" + commit.date());
-
-      // Give some space and show the message.
-      console.log("\n    " + commit.message());
-    });
-
-    // Start emitting events.
-    history.start();
+  //git add, git commit the changes
+  git.addConfig("user.name", process.env.GITHUB_ACTOR);
+  git.addConfig("user.email", "");
+  git.add([file]);
+  git.commit(`added ${loginName} to ${filename}`, [file], {
+    "--author": '"CONTRIBUTIFY BOT <contri@test.com>"'
   });
- */
+
+  git.push(["-u", "origin", "master"], () => console.log("done"));
+  console.log("=================================");
+  console.log("GENERATED FILE AND PUSHED IT TO MASTER RIGHT NOW");
+}
