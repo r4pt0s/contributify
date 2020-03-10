@@ -6,8 +6,9 @@ const fs = require("fs");
 const path = require("path");
 //const git = simpleGit(process.env.GITHUB_WORKSPACE);
 const git = simpleGit();
-const octokit = require("@actions/github");
+const github = require("@actions/github");
 const core = require("@actions/core");
+const octokit = require("@octokit/rest");
 
 const filename = "CONTRIBUTORS.md";
 
