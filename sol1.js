@@ -6,10 +6,28 @@ const fs = require("fs");
 const path = require("path");
 //const git = simpleGit(process.env.GITHUB_WORKSPACE);
 const git = simpleGit();
+const github = require("@actions/github");
+const core = require("@actions/core");
 
 const filename = "CONTRIBUTORS.md";
 
-async function main() {
+async function run() {
+  // This should be a token with access to your repository scoped in as a secret.
+  // The YML workflow will need to set myToken with the GitHub Secret Token
+  // myToken: ${{ secrets.GITHUB_TOKEN }}
+  // https://help.github.com/en/actions/automating-your-workflow-with-github-actions/authenticating-with-the-github_token#about-the-github_token-secret
+  const myToken = process.env.GITHUB_TOKEN; //core.getInput("GITHUB_TOKEN");
+
+  const octokit = new github.GitHub(myToken);
+
+  const { data: pullRequest } = await octokit.pulls.get();
+
+  console.log(pullRequest);
+}
+
+run();
+
+/* async function main() {
   const status = await git.status();
   const commitHistory = await git.log();
   const { author_email, author_name } = commitHistory.all[0];
@@ -47,3 +65,4 @@ async function main() {
 }
 
 main();
+ */
