@@ -11,6 +11,7 @@ const core = require("@actions/core");
 const { Octokit } = require("@octokit/rest");
 
 const filename = "CONTRIBUTORS.md";
+const octokit = Octokit({ auth: process.env.GITHUB_TOKEN });
 
 /* async function run() {
   // This should be a token with access to your repository scoped in as a secret.
@@ -35,12 +36,12 @@ run(); */
 async function main() {
   const status = await git.status();
 
-  console.log(Octokit.pulls.list({ owner, repo }));
+  const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
+  console.log(await octokit.pulls.list({ owner, repo }));
 
   try {
     await git.catFile(["-s", "master:CONTRIBUTORS.md"]);
     // file already exists
-    const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
 
     console.log(master);
   } catch (err) {
