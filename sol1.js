@@ -12,7 +12,7 @@ const core = require("@actions/core");
 const filename = "CONTRIBUTORS.md";
 
 try {
-  const payload = JSON.stringify(github.context.payload, null, 2);
+  const payload = github.context.payload;
   // user who made the pr
   const user = payload.sender;
 
