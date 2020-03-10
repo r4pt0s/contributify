@@ -8,6 +8,7 @@ const path = require("path");
 const git = simpleGit();
 const github = require("@actions/github");
 const core = require("@actions/core");
+const glob = require("@actions/glob");
 
 const filename = "CONTRIBUTORS.md";
 
@@ -24,10 +25,15 @@ try {
 
 async function main(userData) {
   try {
-    await git.catFile([
+    /* await git.catFile([
       "-s",
       `${process.env.GITHUB_WORKSPACE}/tree/master:CONTRIBUTORS.md`
-    ]);
+    ]); */
+    const patterns = ["**/CONTRIBUTORS.md"];
+    const globber = await glob.create(patterns.join("\n"));
+    const files = await globber.glob();
+
+    console.log(files);
     // file already exists
     await createAndCommitFile(userData.login, userData.html_url);
     console.log(master);
