@@ -34,12 +34,14 @@ async function main() {
       file,
       `- [@${author_name}](https://github.com/${author_name}/)`
     );
-    /*  git.addConfig("user.name", author_name);
+    git.addConfig("user.name", author_name);
     git.addConfig("user.email", author_email);
     git.add([file]);
     git.commit("committed CONTRIBUTORS.md file", [file], {
       "--author": '"CONTRIBUTIFY BOT <contri@test.com>"'
-    }); */
+    });
+    git.push(["-u", "origin", "master"], () => console.log("done"));
+
     //git add, git commit the changes
   }
 }
