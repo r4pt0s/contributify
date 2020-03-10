@@ -8,10 +8,15 @@ const path = require("path");
 const git = simpleGit();
 const github = require("@actions/github");
 const core = require("@actions/core");
-const { Octokit } = require("@octokit/rest");
 
 const filename = "CONTRIBUTORS.md";
-const octokit = Octokit({ auth: process.env.GITHUB_TOKEN });
+
+try {
+  const payload = JSON.stringify(github.context.payload, null, 2);
+  console.log("event payload: ", payload);
+} catch (error) {
+  core.setFailed(error.message);
+}
 
 /* async function run() {
   // This should be a token with access to your repository scoped in as a secret.
@@ -37,7 +42,6 @@ async function main() {
   const status = await git.status();
 
   const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
-  console.log(await octokit.pulls.list({ owner, repo }));
 
   try {
     await git.catFile(["-s", "master:CONTRIBUTORS.md"]);
