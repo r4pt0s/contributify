@@ -35,6 +35,7 @@ async function main() {
   const status = await git.status();
   const commitHistory = await git.log();
   const { author_email, author_name } = commitHistory.all[0];
+  console.log(process.env.GITHUB_ACTOR);
   console.log(status);
   const hasContri = status.files.filter(file =>
     file.path.includes("CONTRIBUTORS")
