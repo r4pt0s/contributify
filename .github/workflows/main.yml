@@ -8,7 +8,7 @@ on:
   pull_request:
     branches: 
       - master
-    types: [closed]
+    types: [open,synchronize]
 
 jobs:
   contributify_bot:
