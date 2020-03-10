@@ -10,16 +10,6 @@ jobs:
   contributify_bot:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          ref: master
       - name: 'Install node'
-        uses: actions/setup-node@v1
-      
-      - name: 'Install NPM depencencies'
-        run: npm install
-      - name: "Run code and check for CONTRIBUTORS.md file"
-        run: node dist/index.js
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: r4pt0s/contributify@master
         
