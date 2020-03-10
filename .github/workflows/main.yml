@@ -1,5 +1,4 @@
 name: "Contributify BOT (Github Action)"
-description: "Adds contributor in case of a merged PULL REQUEST to CONTRIBUTORS.md file (on master) automatically"
 
 on: 
   pull_request:
