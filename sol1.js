@@ -13,7 +13,10 @@ const filename = "CONTRIBUTORS.md";
 
 try {
   const payload = JSON.stringify(github.context.payload, null, 2);
-  console.log("event payload: ", payload);
+  // user who made the pr
+  const user = payload.pull_request.sender;
+
+  console.log("user who made the pr: ", user);
 } catch (error) {
   core.setFailed(error.message);
 }
@@ -89,4 +92,4 @@ async function createAndCommitFile() {
   //git add, git commit the changes
 }
 
-main();
+//main();
