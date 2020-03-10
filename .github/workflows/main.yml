@@ -10,7 +10,8 @@ jobs:
   contributify_bot:
     runs-on: ubuntu-latest
     steps:
-      - name: 'Install node'
-      - uses: r4pt0s/contributify@master
-        run: node dist/index.js
+    - name: 'Install node'
+      uses: r4pt0s/contributify@master
+    - name: Run bot  
+    - run: node dist/index.js
         
