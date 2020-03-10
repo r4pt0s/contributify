@@ -24,33 +24,16 @@ try {
 }
 
 async function main(userData) {
-  try {
-    /* await git.catFile([
-      "-s",
-      `${process.env.GITHUB_WORKSPACE}/tree/master:CONTRIBUTORS.md`
-    ]); */
-    const patterns = ["**/CONTRIBUTORS.md"];
-    const globber = await glob.create(patterns.join("\n"));
-    const files = await globber.glob();
+  const patterns = ["**/CONTRIBUTORS.md"];
+  const globber = await glob.create(patterns.join("\n"));
+  const files = await globber.glob();
 
-    console.log(files);
+  console.log(files);
+  if (files.length > 0) {
     // file already exists
-    await createAndCommitFile(userData.login, userData.html_url);
-    console.log(master);
-  } catch (err) {
-    //does not exist
-    console.log("ERROR ENCOUNTERED: ", err);
-    await createAndCommitFile(userData.login, userData.html_url);
+    console.log("FILE EXISTS", "CHECKING ENTRIES IF USER IS ALREADY IN....");
   }
-  //console.log(commitHistory);
-
-  /*if (hasContri.length > 0) {
-    // Do file editing and git add, git commit the changes
-    //fs.writeFileSync('./')
-    console.log("CONTRIBUTORS FILE EXITSTS ALREADY");
-  } else {
-    
-  } */
+  await createAndCommitFile(userData.login, userData.html_url);
 }
 
 async function addAndCommitNewContributor(loginName, profileUrl) {}
