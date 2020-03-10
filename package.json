@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/r4pt0s/contributify#readme",
   "dependencies": {
+    "@actions/core": "^1.2.3",
+    "@actions/github": "^2.1.1",
     "dotenv": "^8.2.0",
     "nodegit": "^0.26.5",
     "simple-git": "^1.131.0"
