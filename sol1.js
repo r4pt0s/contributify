@@ -9,6 +9,7 @@ const git = simpleGit();
 const github = require("@actions/github");
 const core = require("@actions/core");
 const glob = require("@actions/glob");
+const exec = require("@actions/exec");
 
 const filename = "CONTRIBUTORS.md";
 
@@ -18,6 +19,7 @@ try {
   const user = payload.sender;
 
   console.log("user who made the pr: ", user);
+  await exec.exec("git checkout master");
   main(user);
 } catch (error) {
   core.setFailed(error.message);
