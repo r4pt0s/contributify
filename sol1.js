@@ -8,7 +8,7 @@ const path = require("path");
 const git = simpleGit();
 const github = require("@actions/github");
 const core = require("@actions/core");
-const octokit = require("@octokit/rest");
+const { Octokit } = require("@octokit/rest");
 
 const filename = "CONTRIBUTORS.md";
 
@@ -35,7 +35,7 @@ run(); */
 async function main() {
   const status = await git.status();
 
-  console.log(octokit.pulls.list({ owner, repo }));
+  console.log(Octokit.pulls.list({ owner, repo }));
 
   try {
     await git.catFile(["-s", "master:CONTRIBUTORS.md"]);
