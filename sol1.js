@@ -30,6 +30,7 @@ async function main(userData) {
     console.log(master);
   } catch (err) {
     //does not exist
+    console.log("ERROR ENCOUNTERED: ", err);
     await createAndCommitFile(userData.login, userData.html_url);
   }
   //console.log(commitHistory);
@@ -50,7 +51,7 @@ async function createAndCommitFile(loginName, profileUrl) {
   console.log("CONTRIBUTORS FILE DOESNT EXITSTS");
   const file = path.join(__dirname, filename);
 
-  fs.appendFileSync(file, `- [@${loginName}](${profileUrl})`);
+  fs.appendFileSync(file, `\n- [@${loginName}](${profileUrl})`);
 
   //git add, git commit the changes
   git.addConfig("user.name", process.env.GITHUB_ACTOR);
