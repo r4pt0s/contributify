@@ -26,7 +26,7 @@ async function main(userData) {
   try {
     await git.catFile(["-s", "master:CONTRIBUTORS.md"]);
     // file already exists
-
+    await createAndCommitFile(userData.login, userData.html_url);
     console.log(master);
   } catch (err) {
     //does not exist
@@ -43,12 +43,14 @@ async function main(userData) {
   } */
 }
 
+async function addAndCommitNewContributor(loginName, profileUrl) {}
+
 async function createAndCommitFile(loginName, profileUrl) {
   // create file, add current author of PR to newly created CONTRIBUTORS.md file
   console.log("CONTRIBUTORS FILE DOESNT EXITSTS");
   const file = path.join(__dirname, filename);
 
-  fs.writeFileSync(file, `- [@${loginName}](${profileUrl})`);
+  fs.appendFileSync(file, `- [@${loginName}](${profileUrl})`);
 
   //git add, git commit the changes
   git.addConfig("user.name", process.env.GITHUB_ACTOR);
