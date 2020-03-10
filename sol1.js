@@ -25,9 +25,8 @@ async function main() {
     const commitHistory = await git.log();
     const { author_email, author_name } = commitHistory.all[0];
 
-    console.log(file);
+    console.log(commitHistory.all[0]);
     console.log("CURRENT COMMIT ID", process.env.GITHUB_SHA);
-    console.log(process.env);
     console.log(author_email, author_name);
 
     fs.writeFileSync(
