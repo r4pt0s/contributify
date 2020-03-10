@@ -18,6 +18,8 @@ jobs:
       uses: actions/setup-node@v1
     - name: 'run contributify bot'
       uses: r4pt0s/contributify@master 
+      with:
+        workspace: ${{GITHUB_WORKSPACE}}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
