@@ -11,7 +11,8 @@ const glob = require("@actions/glob");
 const filename = "CONTRIBUTORS.md";
 const file = path.join(__dirname, filename);
 
-console.log(process.env.GITHUB_WORKSPACE);
+console.log(core.getInput("workspace"));
+
 try {
   const payload = github.context.payload;
   // user who made the pr

@@ -1,6 +1,9 @@
 name: "Contributify BOT (Github Action)"
 description: "Adds contributor in case of a merged PULL REQUEST to CONTRIBUTORS.md file (on master) automatically"
-
+inputs:
+  workspace: 
+    description: 'Current Repo'
+    required: true
 runs: 
   using: 'node12'
   main: 'dist/index.js'
