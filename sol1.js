@@ -6,7 +6,7 @@ const fs = require("fs");
 const path = require("path");
 //const git = simpleGit(process.env.GITHUB_WORKSPACE);
 const git = simpleGit();
-const github = require("@actions/github");
+const octokit = require("@actions/github");
 const core = require("@actions/core");
 
 const filename = "CONTRIBUTORS.md";
@@ -35,13 +35,12 @@ async function main() {
   const status = await git.status();
   const commitHistory = await git.log();
   const { author_email, author_name } = commitHistory.all[0];
-  //console.log(status);
-  const hasContri = status.files.filter(file =>
-    file.path.includes("CONTRIBUTORS")
-  );
+
+  const master = await git.catFile(["-s", "master:CONTRIBUTORS.md"]);
+  console.log(master);
   //console.log(commitHistory);
 
-  if (hasContri.length > 0) {
+  /*if (hasContri.length > 0) {
     // Do file editing and git add, git commit the changes
     //fs.writeFileSync('./')
     console.log("CONTRIBUTORS FILE EXITSTS ALREADY");
@@ -50,7 +49,7 @@ async function main() {
     console.log("CONTRIBUTORS FILE DOESNT EXITSTS");
     const file = path.join(__dirname, filename);
 
-    console.log(commitHistory.all[0]);
+    console.log(commitHistory.all[2]);
     console.log("CURRENT COMMIT ID", process.env.GITHUB_SHA);
     console.log("AUTHOR AND MAIL: ", author_email, author_name);
 
@@ -67,7 +66,7 @@ async function main() {
     git.push(["-u", "origin", "master"], () => console.log("done"));
 
     //git add, git commit the changes
-  }
+  } */
 }
 
 main();
