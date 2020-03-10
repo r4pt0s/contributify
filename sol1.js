@@ -34,13 +34,14 @@ run(); */
 async function main() {
   const status = await git.status();
 
+  console.log(octokit.pulls.list({ owner, repo }));
+
   try {
     await git.catFile(["-s", "master:CONTRIBUTORS.md"]);
     // file already exists
     const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
 
     console.log(master);
-    console.log(octokit.pulls.list({ owner, repo }));
   } catch (err) {
     //does not exist
     await createAndCommitFile();
