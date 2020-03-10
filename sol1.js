@@ -14,7 +14,7 @@ const filename = "CONTRIBUTORS.md";
 try {
   const payload = JSON.stringify(github.context.payload, null, 2);
   // user who made the pr
-  const user = payload.pull_request.sender;
+  const user = payload.sender;
 
   console.log("user who made the pr: ", user);
 } catch (error) {
