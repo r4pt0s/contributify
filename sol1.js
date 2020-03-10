@@ -35,30 +35,31 @@ async function main() {
   const status = await git.status();
   const commitHistory = await git.log();
   const { author_email, author_name } = commitHistory.all[0];
-  console.log(process.env.GITHUB_ACTOR);
-  console.log(status);
+  //console.log(status);
   const hasContri = status.files.filter(file =>
     file.path.includes("CONTRIBUTORS")
   );
-  console.log(commitHistory);
+  //console.log(commitHistory);
 
   if (hasContri.length > 0) {
     // Do file editing and git add, git commit the changes
     //fs.writeFileSync('./')
+    console.log("CONTRIBUTORS FILE EXITSTS ALREADY");
   } else {
     // create file, add current author of PR and add to readme.md file
+    console.log("CONTRIBUTORS FILE DOESNT EXITSTS");
     const file = path.join(__dirname, filename);
 
     console.log(commitHistory.all[0]);
     console.log("CURRENT COMMIT ID", process.env.GITHUB_SHA);
-    console.log(author_email, author_name);
+    console.log("AUTHOR AND MAIL: ", author_email, author_name);
 
     fs.writeFileSync(
       file,
       `- [@${author_name}](https://github.com/${author_name}/)`
     );
-    /*   git.addConfig("user.name", author_name);
-    git.addConfig("user.email", author_email); */
+    git.addConfig("user.name", process.env.GITHUB_ACTOR);
+    git.addConfig("user.email", "");
     git.add([file]);
     git.commit("committed CONTRIBUTORS.md file", [file], {
       "--author": '"CONTRIBUTIFY BOT <contri@test.com>"'
