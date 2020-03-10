@@ -11,10 +11,13 @@ const filename = "CONTRIBUTORS.md";
 
 async function main() {
   const status = await git.status();
+  const commitHistory = await git.log();
+  const { author_email, author_name } = commitHistory.all[0];
   console.log(status);
   const hasContri = status.files.filter(file =>
     file.path.includes("CONTRIBUTORS")
   );
+  console.log(commitHistory);
 
   if (hasContri.length > 0) {
     // Do file editing and git add, git commit the changes
@@ -22,8 +25,6 @@ async function main() {
   } else {
     // create file, add current author of PR and add to readme.md file
     const file = path.join(__dirname, filename);
-    const commitHistory = await git.log();
-    const { author_email, author_name } = commitHistory.all[0];
 
     console.log(commitHistory.all[0]);
     console.log("CURRENT COMMIT ID", process.env.GITHUB_SHA);
