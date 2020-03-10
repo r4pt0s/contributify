@@ -1,26 +1,9 @@
 name: "Contributify BOT (Github Action)"
 description: "Adds contributor in case of a merged PULL REQUEST to CONTRIBUTORS.md file (on master) automatically"
 
-on: 
-  pull_request:
-    branches: 
-      - master
-    types: [open,synchronize, closed]
-
-jobs:
-  contributify_bot:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          ref: master
-      - name: 'Install node'
-        uses: actions/setup-node@v1
-      
-      - name: 'Install NPM depencencies'
-        run: npm install
-      - name: "Run code and check for CONTRIBUTORS.md file"
-        run: node dist/index.js
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+runs: 
+  using: 'node12'
+  main: 'dist/index.js'
+        #env:
+         # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         

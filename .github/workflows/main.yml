@@ -10,8 +10,14 @@ jobs:
   contributify_bot:
     runs-on: ubuntu-latest
     steps:
+    - name: 'Use checkout action'
+      uses: actions/checkout@v2
+      with:
+        ref: master
     - name: 'Install node'
-      uses: r4pt0s/contributify@master
-    - name: Run bot  
-      run: node dist/index.js
+      uses: actions/setup-node@v1
+    - name: 'run contributify bot'
+      uses: r4pt0s/contributify@master 
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
