@@ -11,23 +11,27 @@ const core = require("@actions/core");
 
 const filename = "CONTRIBUTORS.md";
 
-async function run() {
+/* async function run() {
   // This should be a token with access to your repository scoped in as a secret.
   // The YML workflow will need to set myToken with the GitHub Secret Token
   // myToken: ${{ secrets.GITHUB_TOKEN }}
   // https://help.github.com/en/actions/automating-your-workflow-with-github-actions/authenticating-with-the-github_token#about-the-github_token-secret
-  const myToken = process.env.GITHUB_TOKEN; //core.getInput("GITHUB_TOKEN");
+  const myToken = process.env.GITHUB_TOKEN //core.getInput("GITHUB_TOKEN");
 
   const octokit = new github.GitHub(myToken);
 
-  const { data: pullRequest } = await octokit.pulls.get();
+  const { data: pullRequest } = await octokit.pulls.get({
+    owner: process.env.GITHUB_ACTOR,
+    repo: "rest.js",
+   
+  });
 
   console.log(pullRequest);
 }
 
-run();
+run(); */
 
-/* async function main() {
+async function main() {
   const status = await git.status();
   const commitHistory = await git.log();
   const { author_email, author_name } = commitHistory.all[0];
@@ -52,8 +56,8 @@ run();
       file,
       `- [@${author_name}](https://github.com/${author_name}/)`
     );
-    git.addConfig("user.name", author_name);
-    git.addConfig("user.email", author_email);
+    /*   git.addConfig("user.name", author_name);
+    git.addConfig("user.email", author_email); */
     git.add([file]);
     git.commit("committed CONTRIBUTORS.md file", [file], {
       "--author": '"CONTRIBUTIFY BOT <contri@test.com>"'
@@ -65,4 +69,3 @@ run();
 }
 
 main();
- */
