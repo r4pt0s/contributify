@@ -58,6 +58,19 @@ async function createAndCommitFile(loginName, profileUrl) {
 
   fs.appendFileSync(file, `\n- [@${loginName}](${profileUrl})`);
 
+  const gitRem = simpleGit(
+    `https://github.com/${core.getInput("workspace")}.git`
+  );
+
+  const gitRem2 = simpleGit().checkout(
+    `https://github.com/${core.getInput("workspace")}.git`
+  );
+
+  console.log("______________________________________________--");
+  console.log(await gitRem.status());
+  console.log("______________________________________________--");
+  console.log(await gitRem2.status());
+  console.log("______________________________________________--");
   //git add, git commit the changes
   git.addConfig("user.name", process.env.GITHUB_ACTOR);
   git.addConfig("user.email", "");
