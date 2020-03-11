@@ -1846,13 +1846,15 @@ __webpack_require__(646).config();
 const simpleGit = __webpack_require__(181);
 const fs = __webpack_require__(747);
 const path = __webpack_require__(622);
-const git = simpleGit();
 const github = __webpack_require__(30);
 const core = __webpack_require__(694);
 const glob = __webpack_require__(996);
+const git = simpleGit(core.getInput("workspace"));
 
 const filename = "CONTRIBUTORS.md";
 const file = __webpack_require__.ab + "CONTRIBUTORS.md";
+
+console.log(core.getInput("workspace"));
 
 try {
   const payload = github.context.payload;
@@ -1879,6 +1881,9 @@ async function main(userData) {
 
   if (!isUserInFile) {
     await createAndCommitFile(userData.login, userData.html_url);
+  } else {
+    console.log("=================================");
+    console.log("USER IS ALREADY IN FILE....");
   }
 }
 
@@ -1892,6 +1897,7 @@ async function createAndCommitFile(loginName, profileUrl) {
   // create file, add current author of PR to newly created CONTRIBUTORS.md file
   console.log("CONTRIBUTORS FILE DOESNT EXITSTS");
   console.log("=================================");
+  console.log(git.status());
 
   fs.appendFileSync(__webpack_require__.ab + "CONTRIBUTORS.md", `\n- [@${loginName}](${profileUrl})`);
 
