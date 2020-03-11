@@ -1909,6 +1909,8 @@ async function createAndCommitFile(loginName, profileUrl) {
     "--author": '"CONTRIBUTIFY BOT <contri@test.com>"'
   });
 
+  git.addRemote("origin", process.env.GITHUB_WORKSPACE);
+
   git.push(["-u", "origin", "master"], () => console.log("done"));
   console.log("=================================");
   console.log("GENERATED FILE AND PUSHED IT TO MASTER RIGHT NOW");
