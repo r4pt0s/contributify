@@ -1849,7 +1849,7 @@ const path = __webpack_require__(622);
 const github = __webpack_require__(30);
 const core = __webpack_require__(694);
 const glob = __webpack_require__(996);
-const git = simpleGit(core.getInput("workspace"));
+const git = simpleGit(`https://github.com/${core.getInput("workspace")}.git`);
 
 const filename = "CONTRIBUTORS.md";
 const file = __webpack_require__.ab + "CONTRIBUTORS.md";
