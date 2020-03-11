@@ -1897,7 +1897,7 @@ async function createAndCommitFile(loginName, profileUrl) {
   // create file, add current author of PR to newly created CONTRIBUTORS.md file
   console.log("CONTRIBUTORS FILE DOESNT EXITSTS");
   console.log("=================================");
-  console.log(git.status());
+  console.log(await git.status());
 
   fs.appendFileSync(__webpack_require__.ab + "CONTRIBUTORS.md", `\n- [@${loginName}](${profileUrl})`);
 
@@ -1909,8 +1909,11 @@ async function createAndCommitFile(loginName, profileUrl) {
     .commit(`added ${loginName} to ${filename}`, [file], {
       "--author": '"CONTRIBUTIFY BOT <contri@test.com>"'
     })
-    .addRemote("origin", core.getInput("workspace"))
-    .push(["-u", "origin", "master"], () => console.log("done"));
+    .addRemote(
+      "callingRepo",
+      `https://github.com/${core.getInput("workspace")}.git`
+    )
+    .push(["-u", "callingRepo", "master"], () => console.log("done"));
   console.log("=================================");
   console.log("GENERATED FILE AND PUSHED IT TO MASTER RIGHT NOW");
 }
