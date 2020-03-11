@@ -3,10 +3,10 @@ require("dotenv").config();
 const simpleGit = require("simple-git/promise");
 const fs = require("fs");
 const path = require("path");
-const git = simpleGit(process.env.workspace);
 const github = require("@actions/github");
 const core = require("@actions/core");
 const glob = require("@actions/glob");
+const git = simpleGit(core.getInput("workspace"));
 
 const filename = "CONTRIBUTORS.md";
 const file = path.join(__dirname, filename);
@@ -54,6 +54,7 @@ async function createAndCommitFile(loginName, profileUrl) {
   // create file, add current author of PR to newly created CONTRIBUTORS.md file
   console.log("CONTRIBUTORS FILE DOESNT EXITSTS");
   console.log("=================================");
+  console.log(git.status());
 
   fs.appendFileSync(file, `\n- [@${loginName}](${profileUrl})`);
 
