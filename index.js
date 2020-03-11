@@ -6,7 +6,7 @@ const path = require("path");
 const github = require("@actions/github");
 const core = require("@actions/core");
 const glob = require("@actions/glob");
-const git = simpleGit(`https://github.com/${core.getInput("workspace")}.git`);
+const git = simpleGit(process.env.GITHUB_WORKSPACE);
 
 const filename = "CONTRIBUTORS.md";
 const file = path.join(__dirname, filename);
