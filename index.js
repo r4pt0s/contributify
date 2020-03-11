@@ -3,7 +3,7 @@ require("dotenv").config();
 const simpleGit = require("simple-git/promise");
 const fs = require("fs");
 const path = require("path");
-const git = simpleGit();
+const git = simpleGit(process.env.workspace);
 const github = require("@actions/github");
 const core = require("@actions/core");
 const glob = require("@actions/glob");
