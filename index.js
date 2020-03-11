@@ -6,12 +6,12 @@ const path = require("path");
 const github = require("@actions/github");
 const core = require("@actions/core");
 const glob = require("@actions/glob");
-const git = simpleGit(process.env.GITHUB_WORKSPACE);
+const git = simpleGit();
 
 const filename = "CONTRIBUTORS.md";
 const file = path.join(__dirname, filename);
 
-console.log(core.getInput("workspace"));
+console.log(process.env.GITHUB_WORKSPACE);
 
 try {
   const payload = github.context.payload;
