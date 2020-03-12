@@ -1926,7 +1926,7 @@ async function checkIfContributorExists(loginName) {
   return { fileExists: fileContents.includes(loginName), sha: result.data.sha };
 }
 
-async function createAndCommitFile(fork, loginName, profileUrl, fileSha) {
+async function createAndCommitFile(loginName, profileUrl, fileSha) {
   // create file, add current author of PR to newly created CONTRIBUTORS.md file
   console.log("CONTRIBUTORS FILE DOESNT EXITSTS");
   console.log("=================================");
