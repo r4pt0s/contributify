@@ -1871,12 +1871,12 @@ async function run(payload) {
     this.checks = {};
  */
   console.log(payload.pull_request.user);
-  const { data: pullRequest } = await octokit.pulls.get({
+  /*  const { data: pullRequest } = await octokit.pulls.get({
     owner: payload.repository.owner.login,
     repo: payload.repository.name,
     pull_number: payload.pull_request.number
   });
-  console.log("FROM NEWLY FETCHED PR, ", pullRequest.user);
+  console.log("FROM NEWLY FETCHED PR, ", pullRequest.user); */
 
   main(payload.pull_request.user);
 }
@@ -1887,7 +1887,7 @@ async function main(userLogin) {
   const patterns = ["**/CONTRIBUTORS.md"];
   const globber = await glob.create(patterns.join("\n"));
   const files = await globber.glob();
-  let isUserInFile = null;
+  let isUserInFile = { fileExists: false };
 
   console.log(files);
   if (files.length > 0) {
