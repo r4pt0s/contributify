@@ -61,7 +61,7 @@ async function main(userLogin) {
   }
 
   if (!isUserInFile) {
-    await createAndCommitFile(userData.login, userData.html_url);
+    await createAndCommitFile(userLogin.login, userLogin.html_url);
   } else {
     console.log("=================================");
     console.log("USER IS ALREADY IN FILE....");
