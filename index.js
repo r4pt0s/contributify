@@ -6,7 +6,8 @@ const path = require("path");
 const github = require("@actions/github");
 const core = require("@actions/core");
 const glob = require("@actions/glob");
-const git = simpleGit(`https://github.com/${core.getInput("workspace")}.git`);
+const git = simpleGit();
+const remote = `https://github.com/${core.getInput("workspace")}.git`;
 
 const filename = "CONTRIBUTORS.md";
 const file = path.join(__dirname, filename);
@@ -25,6 +26,11 @@ try {
 async function main(userData) {
   console.log("____________________________");
   console.log(await git.status());
+  git
+    .silent(true)
+    .clone(remote)
+    .then(val => console.log(val))
+    .catch(err => console.error("failed: ", err));
 
   const patterns = ["**/CONTRIBUTORS.md"];
   const globber = await glob.create(patterns.join("\n"));
