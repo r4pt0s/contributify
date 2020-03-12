@@ -1854,6 +1854,8 @@ const remote = `https://github.com/${core.getInput("workspace")}.git`;
 
 const filename = "CONTRIBUTORS.md";
 const file = path.join(__dirname, "..", filename);
+const token = core.getInput("repo-token");
+const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
 
 console.log(process.env.GITHUB_WORKSPACE);
 
@@ -1868,9 +1870,6 @@ try {
 }
 
 async function run(payload) {
-  const token = core.getInput("repo-token");
-  const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
-
   /* 
     this.labels = payload.pull_request.labels.map(x => x.name);
     this.owner = payload.repository.owner.login;
@@ -1925,8 +1924,23 @@ async function createAndCommitFile(loginName, profileUrl) {
   // create file, add current author of PR to newly created CONTRIBUTORS.md file
   console.log("CONTRIBUTORS FILE DOESNT EXITSTS");
   console.log("=================================");
+  const payload = github.context.payload;
 
   fs.appendFileSync(file, `\n- [@${loginName}](${profileUrl})`);
+
+  await octokit.repos.createOrUpdateFile({
+    owner: payload.repository.owner.login,
+    repo: payload.repository.name,
+    message: `CONTRIBUTIFY BOT added ${loginName} to CONTRIBUTORS.md file`,
+    content: `\n [@${loginName}](${profileUrl})`,
+    path: file,
+    sha: process.env.GITHUB_SHA,
+    branch: "master",
+    committer: {
+      name: "CONTRIBUTIFY BOT",
+      email: "no@email.com"
+    }
+  });
 
   console.log("=================================");
   console.log("GENERATED FILE AND PUSHED IT TO MASTER RIGHT NOW");
