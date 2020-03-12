@@ -23,6 +23,9 @@ try {
 }
 
 async function main(userData) {
+  console.log("____________________________");
+  console.log(await git.status());
+
   const patterns = ["**/CONTRIBUTORS.md"];
   const globber = await glob.create(patterns.join("\n"));
   const files = await globber.glob();
