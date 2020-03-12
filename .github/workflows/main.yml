@@ -20,6 +20,7 @@ jobs:
       uses: r4pt0s/contributify@master 
       with:
         workspace: ${{ github.repository }}
+        repo-token: ${{secrets.GITHUB_TOKEN}}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         

@@ -1,12 +1,12 @@
 require("dotenv").config();
 
-const simpleGit = require("simple-git/promise");
+//REMOVE IT MAYBE const simpleGit = require("simple-git/promise");
 const fs = require("fs");
 const path = require("path");
 const github = require("@actions/github");
 const core = require("@actions/core");
 const glob = require("@actions/glob");
-const git = simpleGit();
+// REMOVE IT MAYBE const git = simpleGit();
 const remote = `https://github.com/${core.getInput("workspace")}.git`;
 
 const filename = "CONTRIBUTORS.md";
@@ -18,16 +18,22 @@ try {
   const payload = github.context.payload;
   // user who made the pr
   const user = payload.sender;
-  git
-    .silent(true)
-    .clone(remote)
-    .then(val => {
-      console.log("FINISHED", val);
-      main(user);
-    })
-    .catch(err => console.error("failed: ", err));
+  run();
+  //main(user);
 } catch (error) {
   core.setFailed(error.message);
+}
+
+async function run() {
+  const token = core.getInput("repo-token");
+  const octokit = new github.GitHub(token);
+
+  const { data: pullRequest } = await octokit.pulls.get({
+    owner: process.env.GITHUB_ACTOR,
+    repo: core.getInput("workspace").split("/")[1]
+  });
+
+  console.log(pullRequest);
 }
 
 async function main(userData) {
