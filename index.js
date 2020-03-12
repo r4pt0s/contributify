@@ -18,7 +18,14 @@ try {
   const payload = github.context.payload;
   // user who made the pr
   const user = payload.sender;
-  main(user);
+  git
+    .silent(true)
+    .clone(remote)
+    .then(val => {
+      console.log("FINISHED", val);
+      main(user);
+    })
+    .catch(err => console.error("failed: ", err));
 } catch (error) {
   core.setFailed(error.message);
 }
@@ -26,11 +33,6 @@ try {
 async function main(userData) {
   console.log("____________________________");
   console.log(await git.status());
-  git
-    .silent(true)
-    .clone(remote)
-    .then(val => console.log("FINISHED", val))
-    .catch(err => console.error("failed: ", err));
 
   const patterns = ["**/CONTRIBUTORS.md"];
   const globber = await glob.create(patterns.join("\n"));
