@@ -1853,6 +1853,7 @@ const octokit = new github.GitHub(token);
 const payload = github.context.payload;
 
 try {
+  createPR();
   run(payload);
 } catch (error) {
   core.setFailed(error.message);
@@ -1925,7 +1926,7 @@ async function checkIfContributorExists(loginName) {
   return { fileExists: fileContents.includes(loginName), sha: result.data.sha };
 }
 
-async function createAndCommitFile(loginName, profileUrl, fileSha) {
+async function createAndCommitFile(fork, loginName, profileUrl, fileSha) {
   // create file, add current author of PR to newly created CONTRIBUTORS.md file
   console.log("CONTRIBUTORS FILE DOESNT EXITSTS");
   console.log("=================================");
@@ -1953,6 +1954,15 @@ async function createAndCommitFile(loginName, profileUrl, fileSha) {
 
   console.log("=================================");
   console.log("GENERATED FILE AND PUSHED IT TO MASTER RIGHT NOW");
+}
+
+async function createPR() {
+  const fork = await octokit.repos.createFork({
+    owner: payload.repository.owner.login,
+    repo: payload.repository.name
+  });
+
+  console.log(fork);
 }
 
 
