@@ -1853,7 +1853,7 @@ const git = simpleGit();
 const remote = `https://github.com/${core.getInput("workspace")}.git`;
 
 const filename = "CONTRIBUTORS.md";
-const file = __webpack_require__.ab + "CONTRIBUTORS.md";
+const file = path.join(__dirname, filename);
 
 console.log(process.env.GITHUB_WORKSPACE);
 
@@ -1872,7 +1872,7 @@ async function main(userData) {
   git
     .silent(true)
     .clone(remote)
-    .then(val => console.log(val))
+    .then(val => console.log("FINISHED", val))
     .catch(err => console.error("failed: ", err));
 
   const patterns = ["**/CONTRIBUTORS.md"];
@@ -1897,7 +1897,7 @@ async function main(userData) {
 }
 
 async function checkIfContributorExists(loginName) {
-  const fileContents = fs.readFileSync(__webpack_require__.ab + "CONTRIBUTORS.md", "utf-8");
+  const fileContents = fs.readFileSync(file, "utf-8");
 
   return fileContents.includes(loginName);
 }
@@ -1908,7 +1908,7 @@ async function createAndCommitFile(loginName, profileUrl) {
   console.log("=================================");
   console.log(await git.status());
 
-  fs.appendFileSync(__webpack_require__.ab + "CONTRIBUTORS.md", `\n- [@${loginName}](${profileUrl})`);
+  fs.appendFileSync(file, `\n- [@${loginName}](${profileUrl})`);
 
   //git add, git commit the changes
   git.addConfig("user.name", process.env.GITHUB_ACTOR);

@@ -29,7 +29,7 @@ async function main(userData) {
   git
     .silent(true)
     .clone(remote)
-    .then(val => console.log(val))
+    .then(val => console.log("FINISHED", val))
     .catch(err => console.error("failed: ", err));
 
   const patterns = ["**/CONTRIBUTORS.md"];
