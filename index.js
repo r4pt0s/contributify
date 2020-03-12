@@ -28,10 +28,15 @@ async function run() {
   const token = core.getInput("repo-token");
   const octokit = new github.GitHub(token);
 
-  const { data: pullRequest } = await octokit.pulls.get({
+  const pullRequest = await octokit.pulls.list({
     owner: process.env.GITHUB_ACTOR,
     repo: core.getInput("workspace").split("/")[1]
   });
+
+  /* const { data: pullRequest } = await octokit.pulls.get({
+    owner: process.env.GITHUB_ACTOR,
+    repo: core.getInput("workspace").split("/")[1]
+  }); */
 
   console.log(pullRequest);
 }
