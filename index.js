@@ -35,12 +35,13 @@ async function run(payload) {
     this.requested_reviewers = payload.pull_request.requested_reviewers;
     this.checks = {};
  */
-  console.log(payload);
+  console.log(payload.pull_request.user);
   const { data: pullRequest } = await octokit.pulls.get({
     owner: payload.repository.owner.login,
     repo: payload.repository.name,
     pull_number: payload.pull_request.number
   });
+  console.log("FROM NEWLY FETCHED PR, ", pullRequest.user);
 
   main(payload.pull_request.user);
 }
