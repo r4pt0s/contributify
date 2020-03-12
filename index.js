@@ -82,13 +82,8 @@ async function checkIfContributorExists(loginName) {
   });
   const fileContents = Buffer.from(result.data.content, "base64").toString();
 
-  console.log(
-    "FILE CONTENTS, ",
-    JSON.stringify(result, null, 2),
-    fileContents,
-    "login name:",
-    loginName
-  );
+  console.log("FILE CONTENTS, ", JSON.stringify(result, null, 2), fileContents);
+  console.log("login name:", loginName);
   return { fileExists: fileContents.includes(loginName), sha: result.data.sha };
 }
 
