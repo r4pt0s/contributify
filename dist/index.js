@@ -1857,8 +1857,6 @@ const file = path.join(__dirname, "..", filename);
 const token = core.getInput("repo-token");
 const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
 
-console.log(process.env.GITHUB_WORKSPACE);
-
 try {
   const payload = github.context.payload;
   // user who made the pr
@@ -1886,7 +1884,6 @@ async function run(payload) {
     pull_number: payload.pull_request.number
   });
 
-  console.log(pullRequest);
   main(payload.sender);
 }
 
