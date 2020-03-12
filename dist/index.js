@@ -1885,7 +1885,7 @@ async function run(payload) {
     pull_number: payload.pull_request.number
   });
 
-  main(payload.pull_request.user);
+  main(payload.pull_request.head.user);
 }
 
 async function main(userLogin) {
