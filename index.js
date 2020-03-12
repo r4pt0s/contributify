@@ -26,7 +26,7 @@ try {
 
 async function run(payload) {
   const token = core.getInput("repo-token");
-  const octokit = new github.GitHub(token);
+  const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
 
   /* 
     this.labels = payload.pull_request.labels.map(x => x.name);
