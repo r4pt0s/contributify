@@ -60,6 +60,10 @@ async function main(userLogin) {
     console.log("FILE EXISTS", "CHECKING ENTRIES IF USER IS ALREADY IN....");
     console.log("=================================");
     isUserInFile = await checkIfContributorExists(userLogin.login);
+    console.log(
+      "========================================================================"
+    );
+    console.log("IS USER IN FILE: ", isUserInFile);
   }
 
   if (!isUserInFile.fileExists) {
