@@ -18,19 +18,19 @@ try {
   const payload = github.context.payload;
   // user who made the pr
   const user = payload.sender;
-  run();
+  run(payload);
   //main(user);
 } catch (error) {
   core.setFailed(error.message);
 }
 
-async function run() {
+async function run(payload) {
   const token = core.getInput("repo-token");
   const octokit = new github.GitHub(token);
 
   const pullRequest = await octokit.pulls.list({
-    owner: process.env.GITHUB_ACTOR,
-    repo: core.getInput("workspace").split("/")[1]
+    owner: payload.repository.owner.login,
+    repo: payload.repository.name
   });
 
   /* const { data: pullRequest } = await octokit.pulls.get({
