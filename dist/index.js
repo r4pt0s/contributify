@@ -1849,7 +1849,8 @@ const path = __webpack_require__(622);
 const github = __webpack_require__(30);
 const core = __webpack_require__(694);
 const glob = __webpack_require__(996);
-const git = simpleGit(`https://github.com/${core.getInput("workspace")}.git`);
+const git = simpleGit();
+const remote = `https://github.com/${core.getInput("workspace")}.git`;
 
 const filename = "CONTRIBUTORS.md";
 const file = __webpack_require__.ab + "CONTRIBUTORS.md";
@@ -1868,6 +1869,11 @@ try {
 async function main(userData) {
   console.log("____________________________");
   console.log(await git.status());
+  git
+    .silent(true)
+    .clone(remote)
+    .then(val => console.log(val))
+    .catch(err => console.error("failed: ", err));
 
   const patterns = ["**/CONTRIBUTORS.md"];
   const globber = await glob.create(patterns.join("\n"));
