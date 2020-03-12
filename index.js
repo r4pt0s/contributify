@@ -70,16 +70,16 @@ async function createAndCommitFile(loginName, profileUrl) {
   //git add, git commit the changes
   git.addConfig("user.name", process.env.GITHUB_ACTOR);
   git.addConfig("user.email", "");
-  git
-    .add([file])
-    .commit(`added ${loginName} to ${filename}`, [file], {
-      "--author": '"CONTRIBUTIFY BOT <contri@test.com>"'
-    })
-    .addRemote(
-      "callingRepo",
-      `https://github.com/${core.getInput("workspace")}.git`
-    )
-    .push(["-u", "callingRepo", "master"], () => console.log("done"));
+  git.add([file]);
+  git.commit(`added ${loginName} to ${filename}`, [file], {
+    "--author": '"CONTRIBUTIFY BOT <contri@test.com>"'
+  });
+  git.addRemote(
+    "callingRepo",
+    `https://github.com/${core.getInput("workspace")}.git`
+  );
+  git.push(["-u", "callingRepo", "master"], () => console.log("done"));
+
   console.log("=================================");
   console.log("GENERATED FILE AND PUSHED IT TO MASTER RIGHT NOW");
 }
