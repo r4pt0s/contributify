@@ -10,7 +10,7 @@ const octokit = new github.GitHub(token);
 const payload = github.context.payload;
 
 try {
-  createPR();
+  //createPR();
   run(payload);
 } catch (error) {
   core.setFailed(error.message);
@@ -99,11 +99,7 @@ async function createAndCommitFile(fork, loginName, profileUrl, fileSha) {
       ),
       path: `${filename}`,
       sha: fileSha,
-      branch: "master",
-      committer: {
-        name: "CONTRIBUTIFY BOT",
-        email: "no@email.com"
-      }
+      branch: "master"
     });
   } catch (err) {
     console.log("NOT ABLE TO CREATE OR UPDATE THE FILE: ", err);
