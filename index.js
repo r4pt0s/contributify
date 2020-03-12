@@ -59,11 +59,15 @@ async function main(userLogin) {
     // file already exists
     console.log("FILE EXISTS", "CHECKING ENTRIES IF USER IS ALREADY IN....");
     console.log("=================================");
-    isUserInFile = checkIfContributorExists(userLogin.login);
+    isUserInFile = await checkIfContributorExists(userLogin.login);
   }
 
-  if (!isUserInFile) {
-    await createAndCommitFile(userLogin.login, userLogin.html_url);
+  if (!isUserInFile.fileExists) {
+    await createAndCommitFile(
+      userLogin.login,
+      userLogin.html_url,
+      isUserInFile.sha
+    );
   } else {
     console.log("=================================");
     console.log("USER IS ALREADY IN FILE....");
@@ -78,11 +82,11 @@ async function checkIfContributorExists(loginName) {
   });
   const fileContents = Buffer.from(result.data.content, "base64").toString();
 
-  console.log("FILE CONTENTS, ", JSON.stringify(result, null, 2));
-  return fileContents.includes(loginName);
+  console.log("FILE CONTENTS, ", JSON.stringify(result, null, 2), fileContents);
+  return { fileExists: fileContents.includes(loginName), sha: result.data.sha };
 }
 
-async function createAndCommitFile(loginName, profileUrl) {
+async function createAndCommitFile(loginName, profileUrl, fileSha) {
   // create file, add current author of PR to newly created CONTRIBUTORS.md file
   console.log("CONTRIBUTORS FILE DOESNT EXITSTS");
   console.log("=================================");
@@ -96,7 +100,7 @@ async function createAndCommitFile(loginName, profileUrl) {
       "base64"
     ),
     path: `${filename}`,
-    sha: process.env.GITHUB_SHA,
+    sha: fileSha,
     branch: "master",
     committer: {
       name: "CONTRIBUTIFY BOT",
