@@ -78,7 +78,7 @@ async function checkIfContributorExists(loginName) {
   });
   const fileContents = Buffer.from(result.data.content, "base64").toString();
 
-  console.log("FILE CONTENTS, ", fileContents);
+  console.log("FILE CONTENTS, ", JSON.stringify(result, null, 2));
   return fileContents.includes(loginName);
 }
 
@@ -87,8 +87,6 @@ async function createAndCommitFile(loginName, profileUrl) {
   console.log("CONTRIBUTORS FILE DOESNT EXITSTS");
   console.log("=================================");
   const payload = github.context.payload;
-
-  fs.appendFileSync(file, `\n- [@${loginName}](${profileUrl})`);
 
   await octokit.repos.createOrUpdateFile({
     owner: payload.repository.owner.login,
