@@ -1871,15 +1871,29 @@ async function run(payload) {
   const token = core.getInput("repo-token");
   const octokit = new github.GitHub(token);
 
-  const pullRequest = await octokit.pulls.list({
+  /* 
+    this.labels = payload.pull_request.labels.map(x => x.name);
+    this.owner = payload.repository.owner.login;
+    this.pull_number = payload.pull_request.number;
+    this.reviews = [];
+    this.ref = `heads/${payload.pull_request.head.ref}`;
+    this.repo = payload.repository.name;
+    this.requested_reviewers = payload.pull_request.requested_reviewers;
+    this.checks = {};
+ */
+  const { data: pullRequest } = await octokit.pulls.get({
     owner: payload.repository.owner.login,
-    repo: payload.repository.name
+    repo: payload.repository.name,
+    pull_number: payload.pull_request.number
   });
 
-  /* const { data: pullRequest } = await octokit.pulls.get({
-    owner: process.env.GITHUB_ACTOR,
-    repo: core.getInput("workspace").split("/")[1]
-  }); */
+  const contriFile = await octokit.repos.getContents({
+    owner: payload.repository.owner.login,
+    repo: payload.repository.name,
+    path: "./CONTRIBUTORS.md"
+  });
+
+  console.log(contriFile);
 
   console.log(pullRequest);
 }
