@@ -6,11 +6,11 @@ const path = require("path");
 const github = require("@actions/github");
 const core = require("@actions/core");
 const glob = require("@actions/glob");
-const git = simpleGit;
+const git = simpleGit();
 const remote = `https://github.com/${core.getInput("workspace")}.git`;
 
 const filename = "CONTRIBUTORS.md";
-const file = path.join(__dirname, filename);
+const file = path.join(__dirname, "..", filename);
 
 console.log(process.env.GITHUB_WORKSPACE);
 
@@ -25,8 +25,8 @@ try {
 
 async function main(userData) {
   console.log("____________________________");
-  console.log(await git().status());
-  git()()
+  console.log(await git.status());
+  git
     .silent(true)
     .clone(remote)
     .then(val => console.log("FINISHED", val))
@@ -63,22 +63,22 @@ async function createAndCommitFile(loginName, profileUrl) {
   // create file, add current author of PR to newly created CONTRIBUTORS.md file
   console.log("CONTRIBUTORS FILE DOESNT EXITSTS");
   console.log("=================================");
-  console.log(await git().status());
+  console.log(await git.status());
 
   fs.appendFileSync(file, `\n- [@${loginName}](${profileUrl})`);
 
-  //git() add, git() commit the changes
-  git().addConfig("user.name", process.env.GITHUB_ACTOR);
-  git().addConfig("user.email", "");
-  git("./../").add([file]);
-  git().commit(`added ${loginName} to ${filename}`, [file], {
+  //git add, git commit the changes
+  git.addConfig("user.name", process.env.GITHUB_ACTOR);
+  git.addConfig("user.email", "");
+  git.add([file]);
+  git.commit(`added ${loginName} to ${filename}`, [file], {
     "--author": '"CONTRIBUTIFY BOT <contri@test.com>"'
   });
-  git().addRemote(
+  git.addRemote(
     "callingRepo",
     `https://github.com/${core.getInput("workspace")}.git`
   );
-  git().push(["-u", "callingRepo", "master"], () => console.log("done"));
+  git.push(["-u", "callingRepo", "master"], () => console.log("done"));
 
   console.log("=================================");
   console.log("GENERATED FILE AND PUSHED IT TO MASTER RIGHT NOW");
