@@ -1932,9 +1932,7 @@ async function createAndCommitFile(loginName, profileUrl) {
     owner: payload.repository.owner.login,
     repo: payload.repository.name,
     message: `CONTRIBUTIFY BOT added ${loginName} to CONTRIBUTORS.md file`,
-    content: Buffer.from(`\n- [@${loginName}](${profileUrl})`).toString(
-      "base64"
-    ),
+    content: Buffer.from(`\n- [@${loginName}](${profileUrl})`),
     path: `${filename}`,
     sha: process.env.GITHUB_SHA,
     branch: "master",
