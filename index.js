@@ -41,10 +41,10 @@ async function run(payload) {
     pull_number: payload.pull_request.number
   });
 
-  main(payload.sender);
+  main(payload.pull_request.user);
 }
 
-async function main(userData) {
+async function main(userLogin) {
   console.log("____________________________");
 
   const patterns = ["**/CONTRIBUTORS.md"];
@@ -57,7 +57,7 @@ async function main(userData) {
     // file already exists
     console.log("FILE EXISTS", "CHECKING ENTRIES IF USER IS ALREADY IN....");
     console.log("=================================");
-    isUserInFile = checkIfContributorExists(userData.login);
+    isUserInFile = checkIfContributorExists(userLogin.login);
   }
 
   if (!isUserInFile) {
