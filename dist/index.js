@@ -1887,20 +1887,12 @@ async function run(payload) {
     pull_number: payload.pull_request.number
   });
 
-  const contriFile = await octokit.repos.getContents({
-    owner: payload.repository.owner.login,
-    repo: payload.repository.name,
-    path: "./CONTRIBUTORS.md"
-  });
-
-  console.log(contriFile);
-
   console.log(pullRequest);
+  main(payload.sender);
 }
 
 async function main(userData) {
   console.log("____________________________");
-  console.log(await git.status());
 
   const patterns = ["**/CONTRIBUTORS.md"];
   const globber = await glob.create(patterns.join("\n"));
@@ -1933,22 +1925,8 @@ async function createAndCommitFile(loginName, profileUrl) {
   // create file, add current author of PR to newly created CONTRIBUTORS.md file
   console.log("CONTRIBUTORS FILE DOESNT EXITSTS");
   console.log("=================================");
-  console.log(await git.status());
 
   fs.appendFileSync(file, `\n- [@${loginName}](${profileUrl})`);
-
-  //git add, git commit the changes
-  git.addConfig("user.name", process.env.GITHUB_ACTOR);
-  git.addConfig("user.email", "");
-  git.add([file]);
-  git.commit(`added ${loginName} to ${filename}`, [file], {
-    "--author": '"CONTRIBUTIFY BOT <contri@test.com>"'
-  });
-  git.addRemote(
-    "callingRepo",
-    `https://github.com/${core.getInput("workspace")}.git`
-  );
-  git.push(["-u", "callingRepo", "master"], () => console.log("done"));
 
   console.log("=================================");
   console.log("GENERATED FILE AND PUSHED IT TO MASTER RIGHT NOW");
