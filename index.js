@@ -1,25 +1,16 @@
 require("dotenv").config();
 
-//REMOVE IT MAYBE const simpleGit = require("simple-git/promise");
-const fs = require("fs");
-const path = require("path");
 const github = require("@actions/github");
 const core = require("@actions/core");
 const glob = require("@actions/glob");
-// REMOVE IT MAYBE const git = simpleGit();
-const remote = `https://github.com/${core.getInput("workspace")}.git`;
 
 const filename = "CONTRIBUTORS.md";
-const file = path.join(__dirname, "..", filename);
 const token = core.getInput("repo-token");
-const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
+const octokit = new github.GitHub(token);
 const payload = github.context.payload;
 
 try {
-  // user who made the pr
-  const user = payload.sender;
   run(payload);
-  //main(user);
 } catch (error) {
   core.setFailed(error.message);
 }
@@ -97,21 +88,25 @@ async function createAndCommitFile(loginName, profileUrl, fileSha) {
   console.log("=================================");
   const payload = github.context.payload;
 
-  await octokit.repos.createOrUpdateFile({
-    owner: payload.repository.owner.login,
-    repo: payload.repository.name,
-    message: `CONTRIBUTIFY BOT added ${loginName} to CONTRIBUTORS.md file`,
-    content: Buffer.from(`\n- [@${loginName}](${profileUrl})`).toString(
-      "base64"
-    ),
-    path: `${filename}`,
-    sha: fileSha,
-    branch: "master",
-    committer: {
-      name: "CONTRIBUTIFY BOT",
-      email: "no@email.com"
-    }
-  });
+  try {
+    await octokit.repos.createOrUpdateFile({
+      owner: payload.repository.owner.login,
+      repo: payload.repository.name,
+      message: `CONTRIBUTIFY BOT added ${loginName} to CONTRIBUTORS.md file`,
+      content: Buffer.from(`\n- [@${loginName}](${profileUrl})`).toString(
+        "base64"
+      ),
+      path: `${filename}`,
+      sha: fileSha,
+      branch: "master",
+      committer: {
+        name: "CONTRIBUTIFY BOT",
+        email: "no@email.com"
+      }
+    });
+  } catch (err) {
+    console.log("NOT ABLE TO CREATE OR UPDATE THE FILE: ", err);
+  }
 
   console.log("=================================");
   console.log("GENERATED FILE AND PUSHED IT TO MASTER RIGHT NOW");
