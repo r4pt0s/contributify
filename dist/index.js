@@ -1856,9 +1856,9 @@ const filename = "CONTRIBUTORS.md";
 const file = path.join(__dirname, "..", filename);
 const token = core.getInput("repo-token");
 const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
+const payload = github.context.payload;
 
 try {
-  const payload = github.context.payload;
   // user who made the pr
   const user = payload.sender;
   run(payload);
@@ -1914,8 +1914,14 @@ async function main(userLogin) {
 }
 
 async function checkIfContributorExists(loginName) {
-  const fileContents = fs.readFileSync(file, "utf-8");
+  const result = await octokit.repos.getContents({
+    owner: payload.repository.owner.login,
+    repo: payload.repository.name,
+    path: `${filename}`
+  });
+  const fileContents = Buffer.from(result.data.content, "base64").toString();
 
+  console.log("FILE CONTENTS, ", fileContents);
   return fileContents.includes(loginName);
 }
 
