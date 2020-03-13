@@ -1933,11 +1933,6 @@ async function createAndCommitFile(loginName, profileUrl, fileSha) {
 
   try {
     const currCommit = await getCurrentCommit();
-    const newCommit = await createNewCommit(
-      `CONTRIBUTIFY BOT added ${loginName} to CONTRIBUTORS.md file`,
-      currCommit.treeSha,
-      currCommit.commitSha
-    );
 
     console.log("new commit: ", newCommit);
 
@@ -1950,9 +1945,16 @@ async function createAndCommitFile(loginName, profileUrl, fileSha) {
         "base64"
       ),
       path: `${filename}`,
-      sha: fileSha, //github.context.payload.pull_request.base.sha,
+      sha: currCommit.commitSha, //github.context.payload.pull_request.base.sha,
       branch: "master"
     });
+    const newCommit = await createNewCommit(
+      `CONTRIBUTIFY BOT added ${loginName} to CONTRIBUTORS.md file`,
+      currCommit.treeSha,
+      currCommit.commitSha
+    );
+
+    await setBranchToCommit("master", newCommit.sha);
   } catch (err) {
     console.log("NOT ABLE TO CREATE OR UPDATE THE FILE: ", err);
   }
