@@ -1852,8 +1852,7 @@ const token = core.getInput("repo-token");
 const octokit = new github.GitHub(token);
 const payload = github.context.payload;
 
-//console.log(JSON.stringify(github, null, 2));
-console.log("CONTEXT REPO: ", JSON.stringify(github.context.repo, null, 2));
+console.log(JSON.stringify(github, null, 2));
 
 try {
   //createPR();
@@ -1874,16 +1873,11 @@ async function run(payload) {
     this.checks = {};
  */
   console.log(payload.pull_request.user);
-  /*  const { data: pullRequest } = await octokit.pulls.get({
-    owner: payload.repository.owner.login,
-    repo: payload.repository.name,
-    pull_number: payload.pull_request.number
-  });
-  console.log("FROM NEWLY FETCHED PR, ", pullRequest.user); */
 
   main(payload.pull_request.user);
 }
 
+//! DONE !!!!!!
 async function main(userLogin) {
   console.log("____________________________");
 
@@ -1915,7 +1909,9 @@ async function main(userLogin) {
     console.log("USER IS ALREADY IN FILE....");
   }
 }
+//!!!!!!!
 
+//! DONE !!!
 async function checkIfContributorExists(loginName) {
   const result = await octokit.repos.getContents({
     owner: github.context.repo.owner,
@@ -1924,10 +1920,10 @@ async function checkIfContributorExists(loginName) {
   });
   const fileContents = Buffer.from(result.data.content, "base64").toString();
 
-  console.log("FILE CONTENTS, ", JSON.stringify(result, null, 2), fileContents);
   console.log("login name:", loginName);
   return { fileExists: fileContents.includes(loginName), sha: result.data.sha };
 }
+//!!!!!!!!!
 
 async function createAndCommitFile(loginName, profileUrl, fileSha) {
   // create file, add current author of PR to newly created CONTRIBUTORS.md file
@@ -1936,13 +1932,9 @@ async function createAndCommitFile(loginName, profileUrl, fileSha) {
   const payload = github.context.payload;
 
   try {
-    await octokit.repos.createCommitComment({
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      commit_sha: github.context.payload.pull_request.base.sha,
-      body: `CONTRIBUTIFY BOT added ${loginName} to CONTRIBUTORS.md file`
-    });
+    console.log("current commit: ", await getCurrentCommit());
 
+    // commit message => `CONTRIBUTIFY BOT added ${loginName} to CONTRIBUTORS.md file`
     await octokit.repos.createOrUpdateFile({
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,
@@ -1962,14 +1954,43 @@ async function createAndCommitFile(loginName, profileUrl, fileSha) {
   console.log("GENERATED FILE AND PUSHED IT TO MASTER RIGHT NOW");
 }
 
-async function createPR() {
-  const fork = await octokit.repos.createFork({
-    owner: payload.repository.owner.login,
-    repo: payload.repository.name
+const getCurrentCommit = async (branch = "master") => {
+  const { data: refData } = await octokit.git.getRef({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    ref: `heads/${branch}`
+  });
+  const commitSha = refData.object.sha;
+  const { data: commitData } = await octokit.git.getCommit({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    commit_sha: commitSha
   });
 
-  console.log(fork);
-}
+  return {
+    commitSha,
+    treeSha: commitData.tree.sha
+  };
+};
+
+const createNewCommit = async (message, currentTreeSha, currentCommitSha) =>
+  (
+    await octo.git.createCommit({
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
+      message,
+      tree: currentTreeSha,
+      parents: [currentCommitSha]
+    })
+  ).data;
+
+const setBranchToCommit = (branch = "master", commitSha) =>
+  octokit.git.updateRef({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    ref: `heads/${branch}`,
+    sha: commitSha
+  });
 
 
 /***/ }),
