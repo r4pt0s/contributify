@@ -1986,7 +1986,7 @@ const getCurrentCommit = async (branch = "master") => {
 
 const createNewCommit = async (message, currentTreeSha, currentCommitSha) =>
   (
-    await octo.git.createCommit({
+    await octokit.git.createCommit({
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,
       message,
