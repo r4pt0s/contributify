@@ -109,7 +109,7 @@ async function createAndCommitFile(loginName, profileUrl, fileSha) {
         "base64"
       ),
       path: `${filename}`,
-      sha: currCommit.commitSha, //github.context.payload.pull_request.base.sha,
+      sha: newCommit.sha, //github.context.payload.pull_request.base.sha,
       branch: "master"
     });
   } catch (err) {
