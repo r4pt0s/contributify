@@ -92,6 +92,13 @@ async function createAndCommitFile(loginName, profileUrl, fileSha) {
     const currCommit = await getCurrentCommit();
 
     console.log("new commit: ", newCommit);
+    const newCommit = await createNewCommit(
+      `CONTRIBUTIFY BOT added ${loginName} to CONTRIBUTORS.md file`,
+      currCommit.treeSha,
+      currCommit.commitSha
+    );
+
+    await setBranchToCommit("master", newCommit.sha);
 
     // commit message => `CONTRIBUTIFY BOT added ${loginName} to CONTRIBUTORS.md file`
     await octokit.repos.createOrUpdateFile({
@@ -105,13 +112,6 @@ async function createAndCommitFile(loginName, profileUrl, fileSha) {
       sha: currCommit.commitSha, //github.context.payload.pull_request.base.sha,
       branch: "master"
     });
-    const newCommit = await createNewCommit(
-      `CONTRIBUTIFY BOT added ${loginName} to CONTRIBUTORS.md file`,
-      currCommit.treeSha,
-      currCommit.commitSha
-    );
-
-    await setBranchToCommit("master", newCommit.sha);
   } catch (err) {
     console.log("NOT ABLE TO CREATE OR UPDATE THE FILE: ", err);
   }
