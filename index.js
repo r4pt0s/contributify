@@ -89,7 +89,14 @@ async function createAndCommitFile(loginName, profileUrl, fileSha) {
   const payload = github.context.payload;
 
   try {
-    console.log("current commit: ", await getCurrentCommit());
+    const currCommit = await getCurrentCommit();
+    const newCommit = await createNewCommit(
+      `CONTRIBUTIFY BOT added ${loginName} to CONTRIBUTORS.md file`,
+      currCommit.treeSha,
+      currCommit.commitSha
+    );
+
+    console.log("new commit: ", newCommit);
 
     // commit message => `CONTRIBUTIFY BOT added ${loginName} to CONTRIBUTORS.md file`
     await octokit.repos.createOrUpdateFile({
@@ -111,6 +118,7 @@ async function createAndCommitFile(loginName, profileUrl, fileSha) {
   console.log("GENERATED FILE AND PUSHED IT TO MASTER RIGHT NOW");
 }
 
+//! DONE !!!
 const getCurrentCommit = async (branch = "master") => {
   const { data: refData } = await octokit.git.getRef({
     owner: github.context.repo.owner,
@@ -129,6 +137,7 @@ const getCurrentCommit = async (branch = "master") => {
     treeSha: commitData.tree.sha
   };
 };
+// !!!!!!!!
 
 const createNewCommit = async (message, currentTreeSha, currentCommitSha) =>
   (
