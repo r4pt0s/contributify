@@ -1935,15 +1935,22 @@ async function createAndCommitFile(loginName, profileUrl, fileSha) {
   const payload = github.context.payload;
 
   try {
-    await octokit.repos.createOrUpdateFile({
-      owner: payload.repository.owner.login,
+    await octokit.repos.createCommitComment({
+      owner: payload.repository.owner,
       repo: payload.repository.name,
+      commit_sha: github.context.payload.pull_request.merge_commit_sha,
+      body: `CONTRIBUTIFY BOT added ${loginName} to CONTRIBUTORS.md file`
+    });
+
+    await octokit.repos.createOrUpdateFile({
+      owner: payload.repository.owner,
+      repo: payload.repository,
       message: `CONTRIBUTIFY BOT added ${loginName} to CONTRIBUTORS.md file`,
       content: Buffer.from(`\n- [@${loginName}](${profileUrl})`).toString(
         "base64"
       ),
       path: `${filename}`,
-      sha: fileSha,
+      sha: github.context.payload.pull_request.merge_commit_sha,
       branch: "master"
     });
   } catch (err) {
