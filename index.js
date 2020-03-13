@@ -9,6 +9,8 @@ const token = core.getInput("repo-token");
 const octokit = new github.GitHub(token);
 const payload = github.context.payload;
 
+console.log(JSON.stringify(github, null, 2));
+
 try {
   //createPR();
   run(payload);
