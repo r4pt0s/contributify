@@ -1918,8 +1918,8 @@ async function main(userLogin) {
 
 async function checkIfContributorExists(loginName) {
   const result = await octokit.repos.getContents({
-    owner: payload.repository.owner.login,
-    repo: payload.repository.name,
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
     path: `${filename}`
   });
   const fileContents = Buffer.from(result.data.content, "base64").toString();
@@ -1937,15 +1937,15 @@ async function createAndCommitFile(loginName, profileUrl, fileSha) {
 
   try {
     await octokit.repos.createCommitComment({
-      owner: payload.repository.owner,
-      repo: github.context.payload.pull_request.base.repo,
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
       commit_sha: github.context.payload.pull_request.base.sha,
       body: `CONTRIBUTIFY BOT added ${loginName} to CONTRIBUTORS.md file`
     });
 
     await octokit.repos.createOrUpdateFile({
-      owner: payload.repository.owner,
-      repo: github.context.payload.pull_request.base.repo,
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
       message: `CONTRIBUTIFY BOT added ${loginName} to CONTRIBUTORS.md file`,
       content: Buffer.from(`\n- [@${loginName}](${profileUrl})`).toString(
         "base64"
