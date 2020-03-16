@@ -1856,6 +1856,7 @@ const payload = github.context.payload;
 
 try {
   //createPR();
+  core.debug("STARTING PROCEDURE.....");
   run(payload);
 } catch (error) {
   core.setFailed(error.message);
