@@ -2194,7 +2194,7 @@ async function createPR() {
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     title: "Added new Contributor to CONTRIBUTORS.md file",
-    head: `${github.context.repo.owner}:master`,
+    head: `${github.context.repo.owner}:first-try`,
     base: "master"
   });
 
