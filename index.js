@@ -283,14 +283,16 @@ async function createFile(file) {
 }
 
 async function createRef() {
+  console.log("================createRef-START=================");
+
   const newBranch = await octokit.git.createRef({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     ref: "refs/head/contributify",
-    sha: currentBranch.commitSHA
+    sha: currentBranch.treeSHA
   });
 
-  currentBranch.commitSHA = newBranch.data.object.sha;
+  currentBranch.treeSHA = newBranch.data.object.sha;
 
   console.log(newBranch.data.object);
 }
