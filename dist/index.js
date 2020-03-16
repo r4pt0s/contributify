@@ -2055,24 +2055,26 @@ async function getCurrentTreeSHA() {
   console.log("=================================");
 
   currentBranch.treeSHA = commit.data.sha;
-  currentBranch.parents = commit.data.parents;
+  currentBranch.parents = commit.data.parents.map(commits => commits.sha);
 
   /*  return repo.getCommit(currentBranch.commitSHA).then(commit => {
     currentBranch.treeSHA = commit.data.tree.sha;
   }); */
 }
 
-function createFiles(files) {
-  let promises = [];
+async function createFiles(files) {
+  let createdFiles = [];
   let length = files.length;
+
   for (let i = 0; i < length; i++) {
-    const newFile = createFile(files[i]);
+    const newFile = await createFile(files[i]);
     console.log("===============createFiles==================");
     console.log("CURRENT TREE Parents: ", newFile);
     console.log("=================================");
-    promises.push(newFile);
+    createdFiles.push(newFile);
   }
-  return Promise.all(promises);
+
+  return createdFiles;
 }
 
 async function createFile(file) {
