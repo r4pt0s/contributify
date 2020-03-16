@@ -2025,6 +2025,10 @@ async function getCurrentCommitSHA() {
     ref: "heads/" + currentBranch.name
   });
 
+  console.log("=================================");
+  console.log("CURRENT COMMIT SHA: ", commitSha.data.object.sha);
+  console.log("=================================");
+
   currentBranch.commitSHA = commitSha.data.object.sha;
 
   /*  return repo.getRef("heads/" + currentBranch.name).then(ref => {
@@ -2038,6 +2042,10 @@ async function getCurrentTreeSHA() {
     repo: github.context.repo.repo,
     ref: currentBranch.commitSHA
   });
+
+  console.log("=================================");
+  console.log("CURRENT TREE SHA: ", commit.data.sha);
+  console.log("=================================");
 
   currentBranch.treeSHA = commit.data.sha;
 
@@ -2068,6 +2076,14 @@ async function createFile(file) {
     mode: "100644",
     type: "blob"
   });
+  console.log("=================================");
+  console.log("CREATED FILE: ", {
+    sha: blob.data.sha,
+    path: file.path,
+    mode: "100644",
+    type: "blob"
+  });
+  console.log("=================================");
 
   /* return repo.createBlob(file.content).then(blob => {
     filesToCommit.push({
@@ -2086,7 +2102,15 @@ async function createTree() {
     tree: filesToCommit
   });
 
-  newCommit.treeSHA = newTree.data.sha;
+  console.log("=================================");
+  console.log("CREATED NEW TREE: ", newTree.data.tree);
+  console.log("=================================");
+
+  console.log("=================================");
+  console.log("CREATED NEW SHA: ", newTree.data.sha);
+  console.log("=================================");
+
+  newCommit.treeSHA = newTree.data.tree;
 
   /* return repo.createTree(filesToCommit, currentBranch.treeSHA).then(tree => {
     newCommit.treeSHA = tree.data.sha;
@@ -2102,6 +2126,10 @@ async function createCommit(message) {
     parents: [currentBranch.commitSHA]
   });
 
+  console.log("=================================");
+  console.log("CREATED NEW COMMIT, sha: ", commit.data.sha);
+  console.log("=================================");
+
   newCommit.sha = commit.data.sha;
 
   /* return repo
@@ -2112,11 +2140,15 @@ async function createCommit(message) {
 }
 
 async function updateHead() {
-  await octokit.git.updateRef({
+  const newHead = await octokit.git.updateRef({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     ref: `heads/${currentBranch.name}/${newCommit.sha}`
   });
+
+  console.log("=================================");
+  console.log("UPDATE HEAD: ", JSON.stringify(newHead.data, null, 2));
+  console.log("=================================");
 
   //return repo.updateHead("heads/" + currentBranch.name, newCommit.sha);
 }
