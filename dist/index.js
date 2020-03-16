@@ -2164,7 +2164,8 @@ async function updateHead() {
   const newHead = await octokit.git.updateRef({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
-    ref: `heads/${currentBranch.name}/${newCommit.sha}`
+    ref: `heads/${currentBranch.name}`,
+    sha: newCommit.sha
   });
 
   console.log("===============updateHead-END==================");
