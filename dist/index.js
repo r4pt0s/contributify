@@ -2053,7 +2053,7 @@ async function getCurrentTreeSHA() {
   const commit = await octokit.repos.getCommit({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
-    ref: currentBranch.commitSHA
+    ref: `refs/head/${currentBranch.name}` //currentBranch.commitSHA
   });
 
   console.log("===============getCurrentTreeSHA==================");
