@@ -303,7 +303,7 @@ async function createCommit(message) {
     repo: github.context.repo.repo,
     message,
     tree: newCommit.treeSHA,
-    parents: currentBranch.parents
+    parents: [currentBranch.treeSHA]
   });
 
   console.log("===============createCommit-END==================");
