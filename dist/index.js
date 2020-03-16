@@ -1919,7 +1919,11 @@ async function main(userLogin) {
 async function handelWork({ login, html_url }) {
   try {
     await setRepo(github.context.repo.owner, github.context.repo.repo);
-    await setBranch("master");
+    await setBranch(
+      github.context.repo.owner,
+      github.context.repo.repo,
+      "master"
+    );
     await pushFiles(`CONTRIBUTIFY BOT added ${login} to CONTRIBUTORS.md file`, [
       {
         content: `\n- [@${login}](${html_url})`,
@@ -1988,7 +1992,7 @@ const setRepo = async function(userName, repoName) {
 
 const setBranch = async function(owner, repo, branchName) {
   const branches = await octokit.repos.listBranches({ owner, repo });
-  currentBranch.name = "master";
+  currentBranch.name = branchName;
 
   /* return repo.listBranches().then(branches => {
     let branchExists = branches.data.find(branch => branch.name === branchName);
