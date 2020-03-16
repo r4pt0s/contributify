@@ -2017,15 +2017,18 @@ const setBranch = async function(owner, repo, branchName) {
 };
 
 const pushFiles = function(message, files) {
-  return getCurrentCommitSHA()
-    .then(getCurrentTreeSHA)
-    .then(() => createFiles(files))
-    .then(createTree)
-    .then(() => createCommit(message))
-    .then(updateHead)
-    .catch(e => {
-      console.error(e);
-    });
+  return (
+    getCurrentCommitSHA()
+      .then(getCurrentTreeSHA)
+      .then(() => createFiles(files))
+      .then(createTree)
+      .then(() => createCommit(message))
+      .then(createPR)
+      //.then(updateHead)
+      .catch(e => {
+        console.error(e);
+      })
+  );
 };
 
 async function getCurrentCommitSHA() {
@@ -2184,6 +2187,20 @@ async function updateHead() {
   console.log("=================================");
 
   //return repo.updateHead("heads/" + currentBranch.name, newCommit.sha);
+}
+
+async function createPR() {
+  const newPR = await octokit.pulls.create({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    title: "Added new Contributor to CONTRIBUTORS.md file",
+    head: `${github.context.repo.owner}:master`,
+    base: "master"
+  });
+
+  console.log("===============updateHead-END==================");
+  console.log("MADE A NEW PR: ", JSON.stringify(newPR, null, 2));
+  console.log("=================================");
 }
 
 /* 
