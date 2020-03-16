@@ -2055,7 +2055,11 @@ async function getCurrentTreeSHA() {
   console.log("=================================");
 
   currentBranch.treeSHA = commit.data.sha;
-  currentBranch.parents = commit.data.parents.map(commits => commits.sha);
+  currentBranch.parents = [
+    currentBranch.commitSHA,
+    commit.data.sha,
+    ...commit.data.parents.map(commits => commits.sha)
+  ];
 
   /*  return repo.getCommit(currentBranch.commitSHA).then(commit => {
     currentBranch.treeSHA = commit.data.tree.sha;
@@ -2166,7 +2170,7 @@ async function updateHead() {
     repo: github.context.repo.repo,
     ref: `heads/${currentBranch.name}`,
     sha: newCommit.sha,
-    force: true
+    force: false
   });
 
   console.log("===============updateHead-END==================");
