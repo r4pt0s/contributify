@@ -322,7 +322,8 @@ async function updateHead() {
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     ref: `heads/${currentBranch.name}`,
-    sha: newCommit.sha
+    sha: newCommit.sha,
+    force: true
   });
 
   console.log("===============updateHead-END==================");
