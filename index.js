@@ -157,7 +157,8 @@ const setRepo = async function(userName, repoName) {
 
 const setBranch = async function(owner, repo, branchName) {
   const branches = await octokit.repos.listBranches({ owner, repo });
-  currentBranch.name = branchName;
+  currentBranch.name = "contributify";
+  //currentBranch.name = branchName;
 
   console.log("==============setBranch===================");
 
@@ -174,18 +175,16 @@ const setBranch = async function(owner, repo, branchName) {
 };
 
 const pushFiles = function(message, files) {
-  return (
-    getCurrentCommitSHA()
-      .then(getCurrentTreeSHA)
-      .then(() => createFiles(files))
-      .then(createTree)
-      .then(() => createCommit(message))
-      .then(createPR)
-      //.then(updateHead)
-      .catch(e => {
-        console.error(e);
-      })
-  );
+  return getCurrentCommitSHA()
+    .then(getCurrentTreeSHA)
+    .then(() => createFiles(files))
+    .then(createTree)
+    .then(() => createCommit(message))
+    .then(updateHead)
+    .then(createPR)
+    .catch(e => {
+      console.error(e);
+    });
 };
 
 async function getCurrentCommitSHA() {
@@ -351,7 +350,7 @@ async function createPR() {
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     title: "Added new Contributor to CONTRIBUTORS.md file",
-    head: `${github.context.repo.owner}:first-try`,
+    head: `${github.context.repo.owner}:${currentBranch.name}`,
     base: "master"
   });
 
