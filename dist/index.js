@@ -2001,6 +2001,8 @@ const setRepo = async function(userName, repoName) {
 const setBranch = async function(owner, repo, branchName) {
   const branches = await octokit.repos.listBranches({ owner, repo });
   currentBranch.name = "contributify";
+  await getRef();
+
   await createRef(github.context.payload.pull_request.base.sha);
   //currentBranch.name = branchName;
 
@@ -2138,7 +2140,6 @@ async function getRef() {
 async function createRef(startSHA) {
   console.log("================createRef-START=================");
 
-  getRef();
   const newBranch = await octokit.git.createRef({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
