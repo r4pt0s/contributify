@@ -177,6 +177,7 @@ const setBranch = async function(owner, repo, branchName) {
 const pushFiles = function(message, files) {
   return getCurrentCommitSHA()
     .then(getCurrentTreeSHA)
+    .then(createRef)
     .then(() => createFiles(files))
     .then(createTree)
     .then(() => createCommit(message))
@@ -279,6 +280,19 @@ async function createFile(file) {
       type: "blob"
     });
   }); */
+}
+
+async function createRef() {
+  const newBranch = await octokit.git.createRef({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    ref: "refs/head/contributify",
+    sha: currentBranch.commitSHA
+  });
+
+  currentBranch.commitSHA = newBranch.data.object.sha;
+
+  console.log(newBranch.data.object);
 }
 
 async function createTree() {
