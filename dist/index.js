@@ -1901,7 +1901,7 @@ async function main(userLogin) {
     console.log("IS USER IN FILE: ", isUserInFile);
 
     if (!isUserInFile.userExists) {
-      await handelWork(userLogin);
+      await handelWork(userLogin, isUserInFile.fileContents);
       /*  await createAndCommitFile(
       userLogin.login,
       userLogin.html_url,
@@ -1913,12 +1913,12 @@ async function main(userLogin) {
     }
   } else {
     // IF the file doesn't exist, create the file
-    await handelWork(userLogin);
+    await handelWork(userLogin, "");
   }
 }
 //!!!!!!!
 
-async function handelWork({ login, html_url }) {
+async function handelWork({ login, html_url }, prevContent) {
   try {
     await setRepo(github.context.repo.owner, github.context.repo.repo);
     await setBranch(
@@ -1928,7 +1928,7 @@ async function handelWork({ login, html_url }) {
     );
     await pushFiles(`CONTRIBUTIFY BOT added ${login} to CONTRIBUTORS.md file`, [
       {
-        content: `\n- [@${login}](${html_url})`,
+        content: `${prevContent}\n- [@${login}](${html_url})`,
         path: "CONTRIBUTORS.md"
       }
     ]);
@@ -1948,7 +1948,11 @@ async function checkIfContributorExists(loginName) {
   const fileContents = Buffer.from(result.data.content, "base64").toString();
 
   console.log("login name:", loginName);
-  return { userExists: fileContents.includes(loginName), sha: result.data.sha };
+  return {
+    userExists: fileContents.includes(loginName),
+    sha: result.data.sha,
+    fileContents
+  };
 }
 //!!!!!!!!!
 
