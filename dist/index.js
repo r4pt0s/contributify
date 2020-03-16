@@ -1852,7 +1852,7 @@ const token = core.getInput("repo-token");
 const octokit = new github.GitHub(token);
 const payload = github.context.payload;
 
-console.log(JSON.stringify(github, null, 2));
+//! console.log(JSON.stringify(github, null, 2));
 
 try {
   //createPR();
@@ -1873,7 +1873,7 @@ async function run(payload) {
     this.checks = {};
  */
 
-  console.log(payload.pull_request.user);
+  //! console.log(payload.pull_request.user);
 
   main(payload.pull_request.user);
 }
@@ -2099,7 +2099,7 @@ async function createCommit(message) {
     repo: github.context.repo.repo,
     message,
     tree: newCommit.treeSHA,
-    parents: currentBranch.commitSHA
+    parents: [currentBranch.commitSHA]
   });
 
   newCommit.sha = commit.data.sha;
