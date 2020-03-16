@@ -335,7 +335,7 @@ const getCurrentCommit = async (branch = "master") => {
     treeSha: commitData.tree.sha
   };
 };
-// !!!!!!!!
+// !!!!!!!!!!
 
 const createNewCommit = async (message, currentTreeSha, currentCommitSha) =>
   (
