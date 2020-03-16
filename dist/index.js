@@ -1889,6 +1889,7 @@ async function main(userLogin) {
   let isUserInFile = { userExists: false };
 
   console.log(files);
+
   if (files.length > 0) {
     // file already exists
     console.log("FILE EXISTS", "CHECKING ENTRIES IF USER IS ALREADY IN....");
@@ -1985,6 +1986,8 @@ let newCommit = {};
 
 const setRepo = async function(userName, repoName) {
   //repo = octokit.getRepo(userName, repoName);
+  console.log("===============setRepo==================");
+
   return await octokit.repos.get({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo
@@ -1994,6 +1997,8 @@ const setRepo = async function(userName, repoName) {
 const setBranch = async function(owner, repo, branchName) {
   const branches = await octokit.repos.listBranches({ owner, repo });
   currentBranch.name = branchName;
+
+  console.log("==============setBranch===================");
 
   /* return repo.listBranches().then(branches => {
     let branchExists = branches.data.find(branch => branch.name === branchName);
@@ -2045,10 +2050,7 @@ async function getCurrentTreeSHA() {
   });
 
   console.log("===============getCurrentTreeSHA==================");
-  console.log("CURRENT TREE SHA: ", commit.data.parents);
-  console.log("=================================");
-
-  console.log("===============getCurrentTreeSHA==================");
+  console.log("CURRENT TREE Parents: ", commit.data.parents);
   console.log("CURRENT TREE SHA: ", commit.data.sha);
   console.log("=================================");
 
@@ -2064,12 +2066,18 @@ function createFiles(files) {
   let promises = [];
   let length = files.length;
   for (let i = 0; i < length; i++) {
-    promises.push(createFile(files[i]));
+    const newFile = createFile(files[i]);
+    console.log("===============createFiles==================");
+    console.log("CURRENT TREE Parents: ", newFile);
+    console.log("=================================");
+    promises.push(newFile);
   }
   return Promise.all(promises);
 }
 
 async function createFile(file) {
+  console.log("===============createFile-START==================");
+
   const blob = await octokit.git.createBlob({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
@@ -2082,14 +2090,16 @@ async function createFile(file) {
     mode: "100644",
     type: "blob"
   });
-  console.log("===============createFile==================");
+  console.log("===============createFile-END==================");
   console.log("CREATED FILE: ", {
     sha: blob.data.sha,
     path: file.path,
     mode: "100644",
     type: "blob"
   });
+  console.log("BLOB: ", blob);
   console.log("=================================");
+  return blob;
 
   /* return repo.createBlob(file.content).then(blob => {
     filesToCommit.push({
@@ -2102,17 +2112,16 @@ async function createFile(file) {
 }
 
 async function createTree() {
+  console.log("================createTree-START=================");
+
   const newTree = await octokit.git.createTree({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     tree: filesToCommit
   });
 
-  console.log("================createTree=================");
+  console.log("===============createTree-END==================");
   console.log("CREATED NEW TREE: ", newTree.data.tree);
-  console.log("=================================");
-
-  console.log("================createTree=================");
   console.log("CREATED NEW SHA: ", newTree.data.sha);
   console.log("=================================");
 
@@ -2124,6 +2133,8 @@ async function createTree() {
 }
 
 async function createCommit(message) {
+  console.log("===============createCommit-START==================");
+
   const commit = await octokit.git.createCommit({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
@@ -2132,7 +2143,7 @@ async function createCommit(message) {
     parents: currentBranch.parents
   });
 
-  console.log("===============createCommit==================");
+  console.log("===============createCommit-END==================");
   console.log("CREATED NEW COMMIT, sha: ", commit.data.sha);
   console.log("=================================");
 
@@ -2146,13 +2157,15 @@ async function createCommit(message) {
 }
 
 async function updateHead() {
+  console.log("===============updateHead-START==================");
+
   const newHead = await octokit.git.updateRef({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     ref: `heads/${currentBranch.name}/${newCommit.sha}`
   });
 
-  console.log("===============updateHead==================");
+  console.log("===============updateHead-END==================");
   console.log("UPDATE HEAD: ", JSON.stringify(newHead.data, null, 2));
   console.log("=================================");
 
