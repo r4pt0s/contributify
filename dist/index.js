@@ -2131,7 +2131,7 @@ async function getRef() {
   const refAvailable = await octokit.git.getRef({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
-    ref: `refs/head/${currentBranch.name}`
+    ref: `heads/${currentBranch.name}`
   });
 
   console.log(refAvailable);
@@ -2143,7 +2143,7 @@ async function createRef(startSHA) {
   const newBranch = await octokit.git.createRef({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
-    ref: "refs/head/contributify",
+    ref: "refs/heads/contributify",
     sha: startSHA
   });
 
