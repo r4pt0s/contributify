@@ -1,199 +1,382 @@
 require("dotenv").config();
 
-const git = require("nodegit");
-//const testRepo = "https://github.com/r4pt0s/contributify";
-const path = require("path");
-const fs = require("fs");
-const testRepo = process.env.GITHUB_WORKSPACE;
+const github = require("@actions/github");
+const core = require("@actions/core");
+const glob = require("@actions/glob");
 
-const nameVariations = ["contributors"];
+const filename = "CONTRIBUTORS.md";
+const token = core.getInput("repo-token");
+const octokit = new github.GitHub(token);
+const payload = github.context.payload;
 
-addFile();
-// This example opens a certain file, `README.md`, at a particular commit,
-// and prints the first 10 lines as well as some metadata.
-/* var _entry;
-git.Repository.open(path.resolve(__dirname, "./.git"))
-  .then(function(repo) {
-    return repo.getCommit(process.env.GITHUB_SHA);
-  })
-  .then(function(commit) {
-    let getFile = null;
-    let blob = "";
+//! console.log(JSON.stringify(github, null, 2));
 
-    try {
-      getFile = commit.getEntry("CONTRIBUTORS.md");
-      return getFile;
-    } catch (err) {
-      console.log(err);
-      return addFile().done();
-    }
-
-    console.log("getFILE: ", getFile);
-  })
-  .then(function(entry) {
-    console.log(entry);
-    _entry = entry;
-    return _entry.getBlob();
-  })
-  .then(function(blob) {
-    console.log(_entry.name(), _entry.sha(), blob.rawsize() + "b");
-    console.log("========================================================\n\n");
-    var firstTenLines = blob
-      .toString()
-      .split("\n")
-      .slice(0, 10)
-      .join("\n");
-    console.log(firstTenLines);
-    console.log("...");
-  })
-  .done(); */
-
-function addFile() {
-  var path = require("path");
-  var fse = require("fs-extra");
-  var fileName = "CONTRIBUTORS.md";
-  var fileContent = "- TEST";
-  var directoryName = "./";
-  /**
-   * This example creates a certain file `newfile.txt`, adds it to the git
-   * index and commits it to head. Similar to a `git add newfile.txt`
-   * followed by a `git commit`
-   **/
-
-  var repo;
-  var index;
-  var oid;
-
-  git.Repository.open(process.env.GITHUB_WORKSPACE)
-    .then(function(repoResult) {
-      repo = repoResult;
-      return fse.ensureDir(path.join(repo.workdir(), directoryName));
-    })
-    .then(function() {
-      return fse.writeFile(path.join(repo.workdir(), fileName), fileContent);
-    })
-    .then(function() {
-      return fse.writeFile(
-        path.join(repo.workdir(), directoryName, fileName),
-        fileContent
-      );
-    })
-    .then(function() {
-      return repo.refreshIndex();
-    })
-    .then(function(indexResult) {
-      index = indexResult;
-    })
-    .then(function() {
-      // this file is in the root of the directory and doesn't need a full path
-      return index.addByPath(fileName);
-    })
-    .then(function() {
-      // this file is in a subdirectory and can use a relative path
-      return index.addByPath(path.posix.join(directoryName, fileName));
-    })
-    .then(function() {
-      // this will write both files to the index
-      return index.write();
-    })
-    .then(function() {
-      return index.writeTree();
-    })
-    .then(function(oidResult) {
-      oid = oidResult;
-      return git.Reference.nameToId(repo, "HEAD");
-    })
-    .then(function(head) {
-      return repo.getCommit(head);
-    })
-    .then(function(parent) {
-      var author = git.Signature.now("CONTRIBUTIFY BOT", "contri@test.com");
-      var committer = git.Signature.now("CONTRIBUTIFY BOT", "contri@test.com");
-
-      return repo.createCommit("HEAD", author, committer, "message", oid, [
-        parent
-      ]);
-    })
-    .done(function(commitId) {
-      console.log("New Commit: ", commitId);
-    });
+try {
+  //createPR();
+  core.debug("STARTING PROCEDURE.....");
+  run(payload);
+} catch (error) {
+  core.setFailed(error.message);
 }
 
-/* git
-  .Clone(testRepo, "./tmp")
-  // Look up this known commit.
-  .then(function(repo) {
-    // Use a known commit sha from this repository.
-    console.log(repo.getMasterCommit());
-    return repo.getMasterCommit();
-  })
-  // Look up a specific file within that commit.
-  .then(function(commit) {
-    return commit.getEntry("README.md");
-  })
-  // Get the blob contents from the file.
-  .then(function(entry) {
-    // Patch the blob to contain a reference to the entry.
-    return entry.getBlob().then(function(blob) {
-      blob.entry = entry;
-      return blob;
-    });
-  })
-  // Display information about the blob.
-  .then(function(blob) {
-    // Show the path, sha, and filesize in bytes.
-    console.log(blob.entry.path() + blob.entry.sha() + blob.rawsize() + "b");
+async function run(payload) {
+  /* 
+    this.labels = payload.pull_request.labels.map(x => x.name);
+    this.owner = payload.repository.owner.login;
+    this.pull_number = payload.pull_request.number;
+    this.reviews = [];
+    this.ref = `heads/${payload.pull_request.head.ref}`;
+    this.repo = payload.repository.name;
+    this.requested_reviewers = payload.pull_request.requested_reviewers;
+    this.checks = {};
+ */
 
-    // Show a spacer.
-    console.log(Array(72).join("=") + "\n\n");
+  //! console.log(payload.pull_request.user);
 
-    // Show the entire file.
-    console.log(String(blob));
-  })
-  .catch(function(err) {
-    console.log(err);
-  }); */
-/* 
-// Open the repository directory.
-git.Repository.open(testRepo)
-  // Open the master branch.
-  .then(function(repo) {
-    console.log("I OPENED THE REPO");
-    return repo.getMasterCommit();
-  })
-  // Display information about commits on master.
-  .then(function(firstCommitOnMaster) {
-    // Create a new history event emitter.
-    var history = firstCommitOnMaster.history();
+  main(payload.pull_request.user);
+}
 
-    console.log(history);
-    // Create a counter to only show up to 9 entries.
-    var count = 0;
+//! DONE !!!!!!
+async function main(userLogin) {
+  console.log("____________________________");
 
-    // Listen for commit events from the history.
-    history.on("commit", function(commit) {
-      // Disregard commits past 9.
-      if (++count >= 9) {
-        return;
+  const patterns = ["**/CONTRIBUTORS.md"];
+  const globber = await glob.create(patterns.join("\n"));
+  const files = await globber.glob();
+  let isUserInFile = { userExists: false };
+
+  console.log(files);
+
+  if (files.length > 0) {
+    // file already exists
+    console.log("FILE EXISTS", "CHECKING ENTRIES IF USER IS ALREADY IN....");
+    // console.log("=================================");
+    isUserInFile = await checkIfContributorExists(userLogin.login);
+    console.log(
+      "========================================================================"
+    );
+    console.log("IS USER IN FILE: ", isUserInFile);
+
+    if (!isUserInFile.userExists) {
+      await handelWork(userLogin);
+      /*  await createAndCommitFile(
+      userLogin.login,
+      userLogin.html_url,
+      isUserInFile.sha
+    ); */
+    } else {
+      console.log("=================================");
+      console.log("USER IS ALREADY IN FILE....");
+    }
+  } else {
+    // IF the file doesn't exist, create the file
+    await handelWork(userLogin);
+  }
+}
+//!!!!!!!
+
+async function handelWork({ login, html_url }) {
+  try {
+    await setRepo(github.context.repo.owner, github.context.repo.repo);
+    await setBranch(
+      github.context.repo.owner,
+      github.context.repo.repo,
+      "master"
+    );
+    await pushFiles(`CONTRIBUTIFY BOT added ${login} to CONTRIBUTORS.md file`, [
+      {
+        content: `\n- [@${login}](${html_url})`,
+        path: "CONTRIBUTORS.md"
       }
+    ]);
+    console.log("Files committed!");
+  } catch (err) {
+    console.log("ERROR: ", err);
+  }
+}
 
-      // Show the commit sha.
-      console.log("commit " + commit.sha());
+//! DONE !!!
+async function checkIfContributorExists(loginName) {
+  const result = await octokit.repos.getContents({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    path: `${filename}`
+  });
+  const fileContents = Buffer.from(result.data.content, "base64").toString();
 
-      // Store the author object.
-      var author = commit.author();
+  console.log("login name:", loginName);
+  return { userExists: fileContents.includes(loginName), sha: result.data.sha };
+}
+//!!!!!!!!!
 
-      // Display author information.
-      console.log("Author:\t" + author.name() + " <" + author.email() + ">");
+async function createAndCommitFile(loginName, profileUrl, fileSha) {
+  // create file, add current author of PR to newly created CONTRIBUTORS.md file
+  console.log("CONTRIBUTORS FILE DOESNT EXITSTS");
+  console.log("=================================");
+  const payload = github.context.payload;
 
-      // Show the commit date.
-      console.log("Date:\t" + commit.date());
-
-      // Give some space and show the message.
-      console.log("\n    " + commit.message());
+  try {
+    // commit message => `CONTRIBUTIFY BOT added ${loginName} to CONTRIBUTORS.md file`
+    await octokit.repos.createOrUpdateFile({
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
+      message: `CONTRIBUTIFY BOT added ${loginName} to CONTRIBUTORS.md file`,
+      content: Buffer.from(`\n- [@${loginName}](${profileUrl})`).toString(
+        "base64"
+      ),
+      path: `${filename}`,
+      sha: fileSha, //github.context.payload.pull_request.base.sha,
+      branch: "master"
     });
+  } catch (err) {
+    console.log("NOT ABLE TO CREATE OR UPDATE THE FILE: ", err);
+  }
 
-    // Start emitting events.
-    history.start();
+  console.log("=================================");
+  console.log("GENERATED FILE AND PUSHED IT TO MASTER RIGHT NOW");
+}
+
+let repo;
+let filesToCommit = [];
+let currentBranch = {};
+let newCommit = {};
+
+const setRepo = async function(userName, repoName) {
+  //repo = octokit.getRepo(userName, repoName);
+  console.log("===============setRepo==================");
+
+  return await octokit.repos.get({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo
+  });
+};
+
+const setBranch = async function(owner, repo, branchName) {
+  const branches = await octokit.repos.listBranches({ owner, repo });
+  currentBranch.name = branchName;
+
+  console.log("==============setBranch===================");
+
+  /* return repo.listBranches().then(branches => {
+    let branchExists = branches.data.find(branch => branch.name === branchName);
+    if (!branchExists) {
+      return repo.createBranch("master", branchName).then(() => {
+        currentBranch.name = branchName;
+      });
+    } else {
+      currentBranch.name = branchName;
+    }
+  }); */
+};
+
+const pushFiles = function(message, files) {
+  return getCurrentCommitSHA()
+    .then(getCurrentTreeSHA)
+    .then(() => createFiles(files))
+    .then(createTree)
+    .then(() => createCommit(message))
+    .then(updateHead)
+    .catch(e => {
+      console.error(e);
+    });
+};
+
+async function getCurrentCommitSHA() {
+  const commitSha = await octokit.git.getRef({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    ref: "heads/" + currentBranch.name
+  });
+
+  console.log("=================================");
+  console.log("CURRENT COMMIT SHA: ", commitSha.data.object.sha);
+  console.log("=================================");
+
+  currentBranch.commitSHA = commitSha.data.object.sha;
+
+  /*  return repo.getRef("heads/" + currentBranch.name).then(ref => {
+    currentBranch.commitSHA = ref.data.object.sha;
+  }); */
+}
+
+async function getCurrentTreeSHA() {
+  const commit = await octokit.repos.getCommit({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    ref: currentBranch.commitSHA
+  });
+
+  console.log("===============getCurrentTreeSHA==================");
+  console.log("CURRENT TREE Parents: ", commit.data.parents);
+  console.log("CURRENT TREE SHA: ", commit.data.sha);
+  console.log("=================================");
+
+  currentBranch.treeSHA = commit.data.sha;
+
+  currentBranch.parents = [
+    currentBranch.commitSHA,
+    commit.data.sha,
+    ...commit.data.parents.map(commits => commits.sha)
+  ];
+
+  /*  return repo.getCommit(currentBranch.commitSHA).then(commit => {
+    currentBranch.treeSHA = commit.data.tree.sha;
+  }); */
+}
+
+async function createFiles(files) {
+  let createdFiles = [];
+  let length = files.length;
+
+  for (let i = 0; i < length; i++) {
+    const newFile = await createFile(files[i]);
+    console.log("===============createFiles==================");
+    console.log("CURRENT TREE Parents: ", newFile);
+    console.log("=================================");
+    createdFiles.push(newFile);
+  }
+
+  return createdFiles;
+}
+
+async function createFile(file) {
+  console.log("===============createFile-START==================");
+
+  const blob = await octokit.git.createBlob({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    content: file.content
+  });
+
+  filesToCommit.push({
+    sha: blob.data.sha,
+    path: file.path,
+    mode: "100644",
+    type: "blob"
+  });
+  console.log("===============createFile-END==================");
+  console.log("CREATED FILE: ", {
+    sha: blob.data.sha,
+    path: file.path,
+    mode: "100644",
+    type: "blob"
+  });
+  console.log("BLOB: ", blob);
+  console.log("=================================");
+  return blob;
+
+  /* return repo.createBlob(file.content).then(blob => {
+    filesToCommit.push({
+      sha: blob.data.sha,
+      path: fileInfo.path,
+      mode: "100644",
+      type: "blob"
+    });
+  }); */
+}
+
+async function createTree() {
+  console.log("================createTree-START=================");
+
+  const newTree = await octokit.git.createTree({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    base_tree: currentBranch.treeSHA,
+    tree: filesToCommit
+  });
+
+  console.log("===============createTree-END==================");
+  console.log("CREATED NEW TREE: ", newTree.data.tree);
+  console.log("CREATED NEW SHA: ", newTree.data.sha);
+  console.log("=================================");
+
+  newCommit.treeSHA = newTree.data.sha;
+
+  /* return repo.createTree(filesToCommit, currentBranch.treeSHA).then(tree => {
+    newCommit.treeSHA = tree.data.sha;
+  }); */
+}
+
+async function createCommit(message) {
+  console.log("===============createCommit-START==================");
+
+  const commit = await octokit.git.createCommit({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    message,
+    tree: newCommit.treeSHA,
+    parents: [currentBranch.treeSHA]
+  });
+
+  console.log("===============createCommit-END==================");
+  console.log("CREATED NEW COMMIT, sha: ", commit.data.sha);
+  console.log("=================================");
+
+  newCommit.sha = commit.data.sha;
+
+  /* return repo
+    .commit(currentBranch.commitSHA, newCommit.treeSHA, message)
+    .then(commit => {
+      newCommit.sha = commit.data.sha;
+    }); */
+}
+
+async function updateHead() {
+  console.log("===============updateHead-START==================");
+
+  const newHead = await octokit.git.updateRef({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    ref: `heads/${currentBranch.name}`,
+    sha: newCommit.sha,
+    force: false
+  });
+
+  console.log("===============updateHead-END==================");
+  console.log("UPDATE HEAD: ", JSON.stringify(newHead.data, null, 2));
+  console.log("=================================");
+
+  //return repo.updateHead("heads/" + currentBranch.name, newCommit.sha);
+}
+
+/* 
+//! DONE !!!
+const getCurrentCommit = async (branch = "master") => {
+  const { data: refData } = await octokit.git.getRef({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    ref: `heads/${branch}`
+  });
+  const commitSha = refData.object.sha;
+  const { data: commitData } = await octokit.git.getCommit({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    commit_sha: commitSha
+  });
+
+  return {
+    commitSha,
+    treeSha: commitData.tree.sha
+  };
+};
+// !!!!!!!!!!
+
+const createNewCommit = async (message, currentTreeSha, currentCommitSha) =>
+  (
+    await octokit.git.createCommit({
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
+      message,
+      tree: currentTreeSha,
+      parents: [currentCommitSha]
+    })
+  ).data;
+
+const setBranchToCommit = (branch = "master", commitSha) =>
+  octokit.git.updateRef({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    ref: `heads/${branch}`,
+    sha: commitSha
   });
  */

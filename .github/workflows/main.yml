@@ -1,27 +1,26 @@
-name: "Github Action - Contributify"
+name: "Contributify BOT (Github Action)"
 
 on: 
-  #push:
-   # branches: 
-    #  - master
-    #  - first-action
   pull_request:
+    types: [open,synchronize, closed]
     branches: 
       - master
-    types: [open,synchronize, closed]
 
 jobs:
   contributify_bot:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: 'Install node'
-        uses: actions/setup-node@v1
-      
-      - name: 'Install NPM depencencies'
-        run: npm install
-      - name: "Run code and check for CONTRIBUTORS.md file"
-        run: node sol1.js
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: 'Use checkout action'
+      uses: actions/checkout@v2
+      with:
+        ref: master
+    - name: 'Install node'
+      uses: actions/setup-node@v1
+    - name: 'run contributify bot'
+      uses: r4pt0s/contributify@master 
+      with:
+        workspace: ${{ github.repository }}
+        repo-token: ${{secrets.GITHUB_TOKEN}}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
