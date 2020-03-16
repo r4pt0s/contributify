@@ -212,6 +212,7 @@ async function getCurrentTreeSHA() {
   console.log("=================================");
 
   currentBranch.treeSHA = commit.data.sha;
+
   currentBranch.parents = [
     currentBranch.commitSHA,
     commit.data.sha,
@@ -280,6 +281,7 @@ async function createTree() {
   const newTree = await octokit.git.createTree({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
+    base_tree: currentBranch.treeSHA,
     tree: filesToCommit
   });
 
