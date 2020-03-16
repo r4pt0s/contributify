@@ -1,13 +1,12 @@
-name: 'Hello World'
-description: 'Greet someone and record the time'
+name: "Contributify BOT (Github Action)"
+description: "Adds contributor in case of a merged PULL REQUEST to CONTRIBUTORS.md file (on master) automatically"
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
+  workspace: 
+    description: 'Current Repo'
     required: true
-    default: 'World'
-outputs:
-  time: # id of output
-    description: 'The time we greeted you'
-runs:
+  repo-token:
+    description: 'Current Github Token'
+    required: true
+runs: 
   using: 'node12'
-  main: 'index.js'
+  main: 'dist/index.js'
