@@ -2043,11 +2043,16 @@ async function getCurrentTreeSHA() {
     ref: currentBranch.commitSHA
   });
 
+  console.log("===============getCurrentTreeSHA==================");
+  console.log("CURRENT TREE SHA: ", commit.data.parents);
   console.log("=================================");
+
+  console.log("===============getCurrentTreeSHA==================");
   console.log("CURRENT TREE SHA: ", commit.data.sha);
   console.log("=================================");
 
   currentBranch.treeSHA = commit.data.sha;
+  currentBranch.parents = commit.data.parents;
 
   /*  return repo.getCommit(currentBranch.commitSHA).then(commit => {
     currentBranch.treeSHA = commit.data.tree.sha;
@@ -2076,7 +2081,7 @@ async function createFile(file) {
     mode: "100644",
     type: "blob"
   });
-  console.log("=================================");
+  console.log("===============createFile==================");
   console.log("CREATED FILE: ", {
     sha: blob.data.sha,
     path: file.path,
@@ -2102,15 +2107,15 @@ async function createTree() {
     tree: filesToCommit
   });
 
-  console.log("=================================");
+  console.log("================createTree=================");
   console.log("CREATED NEW TREE: ", newTree.data.tree);
   console.log("=================================");
 
-  console.log("=================================");
+  console.log("================createTree=================");
   console.log("CREATED NEW SHA: ", newTree.data.sha);
   console.log("=================================");
 
-  newCommit.treeSHA = newTree.data.tree;
+  newCommit.treeSHA = newTree.data.sha;
 
   /* return repo.createTree(filesToCommit, currentBranch.treeSHA).then(tree => {
     newCommit.treeSHA = tree.data.sha;
@@ -2123,10 +2128,10 @@ async function createCommit(message) {
     repo: github.context.repo.repo,
     message,
     tree: newCommit.treeSHA,
-    parents: [currentBranch.commitSHA]
+    parents: currentBranch.parents
   });
 
-  console.log("=================================");
+  console.log("===============createCommit==================");
   console.log("CREATED NEW COMMIT, sha: ", commit.data.sha);
   console.log("=================================");
 
@@ -2146,7 +2151,7 @@ async function updateHead() {
     ref: `heads/${currentBranch.name}/${newCommit.sha}`
   });
 
-  console.log("=================================");
+  console.log("===============updateHead==================");
   console.log("UPDATE HEAD: ", JSON.stringify(newHead.data, null, 2));
   console.log("=================================");
 
