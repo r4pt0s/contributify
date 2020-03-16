@@ -282,9 +282,20 @@ async function createFile(file) {
   }); */
 }
 
+async function getRef() {
+  const refAvailable = await octokit.git.getRef({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    ref: `refs/head/${currentBranch.name}`
+  });
+
+  console.log(refAvailable);
+}
+
 async function createRef(startSHA) {
   console.log("================createRef-START=================");
 
+  getRef();
   const newBranch = await octokit.git.createRef({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
