@@ -158,7 +158,7 @@ const setRepo = async function(userName, repoName) {
 const setBranch = async function(owner, repo, branchName) {
   const branches = await octokit.repos.listBranches({ owner, repo });
   currentBranch.name = "contributify";
-  await getRef();
+  //await getRef();
 
   await createRef(github.context.payload.pull_request.base.sha);
   //currentBranch.name = branchName;
