@@ -20,7 +20,7 @@ It only works by adding a Contributor at least as Collaborator and granting read
 ## How to use it?
 
 Here is a basic sample workflow file which has to placed at ```.github/workflows```. 
-The prevered name would be main.yml
+The prefered name would be main.yml
 
 ```
 name: "Contributify BOT (Github Action)"
