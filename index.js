@@ -138,7 +138,7 @@ async function getCurrentCommitSHA() {
   const commitSha = await octokit.git.getRef({
     owner,
     repo,
-    ref: "heads/master" //+ currentBranch.name
+    ref: `refs/heads/${currentBranch.name}"`
   });
 
   //use master as ref
@@ -154,7 +154,7 @@ async function getCurrentTreeSHA() {
   const commit = await octokit.repos.getCommit({
     owner,
     repo,
-    ref: `refs/heads/master` //${currentBranch.name}
+    ref: `refs/heads/${currentBranch.name}` //
     //commit_sha: github.context.payload.pull_request.base.sha
   });
 
