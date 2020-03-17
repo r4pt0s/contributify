@@ -45,8 +45,6 @@ jobs:
       uses: r4pt0s/contributify@v1 
       with:
         repo-token: ${{secrets.GITHUB_TOKEN}}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```  
 
 ## Inputs
