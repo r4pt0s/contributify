@@ -13,8 +13,8 @@ const { owner, repo } = github.context.repo;
 const branchName = "contributify";
 const prHeadRef = github.context.payload.pull_request.head.ref;
 const userToAdd = {
-  name: payload.login,
-  htmlUrl: payload.html_url
+  name: payload.pull_request.user.login,
+  htmlUrl: payload.pull_request.user.html_url
 };
 
 try {
@@ -114,15 +114,6 @@ async function checkIfContributorExists(userName) {
 let filesToCommit = [];
 let currentBranch = {};
 let newCommit = {};
-
-/* const setRepo = async function(userName, repoName) {
-  console.log("===============setRepo==================");
-
-  return await octokit.repos.get({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo
-  });
-}; */
 
 const setAndCreateBranch = async function() {
   console.log("==============setBranch===================");
