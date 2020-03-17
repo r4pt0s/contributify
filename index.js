@@ -178,18 +178,16 @@ const setBranch = async function(owner, repo, branchName) {
 };
 
 const pushFiles = function(message, files) {
-  return (
-    getCurrentCommitSHA()
-      .then(getCurrentTreeSHA)
-      .then(() => createFiles(files))
-      .then(createTree)
-      .then(() => createCommit(message))
-      //.then(updateHead)
-      .then(createPR)
-      .catch(e => {
-        console.error(e);
-      })
-  );
+  return getCurrentCommitSHA()
+    .then(getCurrentTreeSHA)
+    .then(() => createFiles(files))
+    .then(createTree)
+    .then(() => createCommit(message))
+    .then(updateHead)
+    .then(createPR)
+    .catch(e => {
+      console.error(e);
+    });
 };
 
 async function getCurrentCommitSHA() {
@@ -365,14 +363,12 @@ async function updateHead() {
     repo: github.context.repo.repo,
     ref: `heads/${currentBranch.name}`,
     sha: newCommit.sha,
-    force: false
+    force: true
   });
 
   console.log("===============updateHead-END==================");
   console.log("UPDATE HEAD: ", JSON.stringify(newHead.data, null, 2));
   console.log("=================================");
-
-  //return repo.updateHead("heads/" + currentBranch.name, newCommit.sha);
 }
 
 async function createPR() {
