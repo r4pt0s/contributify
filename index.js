@@ -9,31 +9,29 @@ const token = core.getInput("repo-token");
 const octokit = new github.GitHub(token);
 const payload = github.context.payload;
 
-//! console.log(JSON.stringify(github, null, 2));
+console.log(JSON.stringify(github.context.repo, null, 2));
 
 try {
-  //createPR();
-  core.debug("STARTING PROCEDURE.....");
   run(payload);
 } catch (error) {
   core.setFailed(error.message);
 }
 
 async function run(payload) {
-  /* 
-    this.labels = payload.pull_request.labels.map(x => x.name);
-    this.owner = payload.repository.owner.login;
-    this.pull_number = payload.pull_request.number;
-    this.reviews = [];
-    this.ref = `heads/${payload.pull_request.head.ref}`;
-    this.repo = payload.repository.name;
-    this.requested_reviewers = payload.pull_request.requested_reviewers;
-    this.checks = {};
- */
-
-  //! console.log(payload.pull_request.user);
-
-  main(payload.pull_request.user);
+  if (github.context.payload.pull_request.head.ref === "contributify") {
+    const delRef = await octokit.git.deleteRef({
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
+      ref: `refs/heads/${github.context.payload.pull_request.head.ref}`
+    });
+    console.log(
+      "=============MERGED PR FROM CONTRIBUTIFY BOT=================="
+    );
+    console.log("END");
+    return;
+  } else {
+    main(payload.pull_request.user);
+  }
 }
 
 //! DONE !!!!!!
@@ -59,11 +57,6 @@ async function main(userLogin) {
 
     if (!isUserInFile.userExists) {
       await handelWork(userLogin, isUserInFile.fileContents);
-      /*  await createAndCommitFile(
-      userLogin.login,
-      userLogin.html_url,
-      isUserInFile.sha
-    ); */
     } else {
       console.log("=================================");
       console.log("USER IS ALREADY IN FILE....");
@@ -85,7 +78,7 @@ async function handelWork({ login, html_url }, prevContent) {
     );
     await pushFiles(`CONTRIBUTIFY BOT added ${login} to CONTRIBUTORS.md file`, [
       {
-        content: `${prevContent}\n- [@${login}](${html_url})`,
+        content: `${prevContent}- [@${login}](${html_url})\n`,
         path: "CONTRIBUTORS.md"
       }
     ]);
@@ -113,40 +106,11 @@ async function checkIfContributorExists(loginName) {
 }
 //!!!!!!!!!
 
-async function createAndCommitFile(loginName, profileUrl, fileSha) {
-  // create file, add current author of PR to newly created CONTRIBUTORS.md file
-  console.log("CONTRIBUTORS FILE DOESNT EXITSTS");
-  console.log("=================================");
-  const payload = github.context.payload;
-
-  try {
-    // commit message => `CONTRIBUTIFY BOT added ${loginName} to CONTRIBUTORS.md file`
-    await octokit.repos.createOrUpdateFile({
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      message: `CONTRIBUTIFY BOT added ${loginName} to CONTRIBUTORS.md file`,
-      content: Buffer.from(`\n- [@${loginName}](${profileUrl})`).toString(
-        "base64"
-      ),
-      path: `${filename}`,
-      sha: fileSha, //github.context.payload.pull_request.base.sha,
-      branch: "master"
-    });
-  } catch (err) {
-    console.log("NOT ABLE TO CREATE OR UPDATE THE FILE: ", err);
-  }
-
-  console.log("=================================");
-  console.log("GENERATED FILE AND PUSHED IT TO MASTER RIGHT NOW");
-}
-
-let repo;
 let filesToCommit = [];
 let currentBranch = {};
 let newCommit = {};
 
 const setRepo = async function(userName, repoName) {
-  //repo = octokit.getRepo(userName, repoName);
   console.log("===============setRepo==================");
 
   return await octokit.repos.get({
@@ -156,25 +120,9 @@ const setRepo = async function(userName, repoName) {
 };
 
 const setBranch = async function(owner, repo, branchName) {
-  const branches = await octokit.repos.listBranches({ owner, repo });
-  currentBranch.name = "contributify";
-  //await getRef();
-
-  await createRef(github.context.payload.pull_request.base.sha);
-  //currentBranch.name = branchName;
-
   console.log("==============setBranch===================");
-
-  /* return repo.listBranches().then(branches => {
-    let branchExists = branches.data.find(branch => branch.name === branchName);
-    if (!branchExists) {
-      return repo.createBranch("master", branchName).then(() => {
-        currentBranch.name = branchName;
-      });
-    } else {
-      currentBranch.name = branchName;
-    }
-  }); */
+  currentBranch.name = "contributify";
+  await createRef(github.context.payload.pull_request.base.sha);
 };
 
 const pushFiles = function(message, files) {
@@ -202,17 +150,13 @@ async function getCurrentCommitSHA() {
   console.log("=================================");
 
   currentBranch.commitSHA = commitSha.data.object.sha;
-
-  /*  return repo.getRef("heads/" + currentBranch.name).then(ref => {
-    currentBranch.commitSHA = ref.data.object.sha;
-  }); */
 }
 
 async function getCurrentTreeSHA() {
   const commit = await octokit.repos.getCommit({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
-    ref: `refs/head/${currentBranch.name}` //currentBranch.commitSHA
+    ref: `refs/head/${currentBranch.name}`
   });
 
   console.log("===============getCurrentTreeSHA==================");
@@ -227,10 +171,6 @@ async function getCurrentTreeSHA() {
     commit.data.sha,
     ...commit.data.parents.map(commits => commits.sha)
   ];
-
-  /*  return repo.getCommit(currentBranch.commitSHA).then(commit => {
-    currentBranch.treeSHA = commit.data.tree.sha;
-  }); */
 }
 
 async function createFiles(files) {
@@ -249,7 +189,7 @@ async function createFiles(files) {
 }
 
 async function createFile(file) {
-  console.log("===============createFile-START==================");
+  console.log("===============createFile==================");
 
   const blob = await octokit.git.createBlob({
     owner: github.context.repo.owner,
@@ -263,7 +203,7 @@ async function createFile(file) {
     mode: "100644",
     type: "blob"
   });
-  console.log("===============createFile-END==================");
+  /*   console.log("===============createFile-END==================");
   console.log("CREATED FILE: ", {
     sha: blob.data.sha,
     path: file.path,
@@ -272,16 +212,8 @@ async function createFile(file) {
   });
   console.log("BLOB: ", blob);
   console.log("=================================");
+  */
   return blob;
-
-  /* return repo.createBlob(file.content).then(blob => {
-    filesToCommit.push({
-      sha: blob.data.sha,
-      path: fileInfo.path,
-      mode: "100644",
-      type: "blob"
-    });
-  }); */
 }
 
 async function getRef() {
@@ -325,10 +257,6 @@ async function createTree() {
   console.log("=================================");
 
   newCommit.treeSHA = newTree.data.sha;
-
-  /* return repo.createTree(filesToCommit, currentBranch.treeSHA).then(tree => {
-    newCommit.treeSHA = tree.data.sha;
-  }); */
 }
 
 async function createCommit(message) {
@@ -347,12 +275,6 @@ async function createCommit(message) {
   console.log("=================================");
 
   newCommit.sha = commit.data.sha;
-
-  /* return repo
-    .commit(currentBranch.commitSHA, newCommit.treeSHA, message)
-    .then(commit => {
-      newCommit.sha = commit.data.sha;
-    }); */
 }
 
 async function updateHead() {
@@ -384,45 +306,3 @@ async function createPR() {
   console.log("MADE A NEW PR: ", JSON.stringify(newPR, null, 2));
   console.log("=================================");
 }
-
-/* 
-//! DONE !!!
-const getCurrentCommit = async (branch = "master") => {
-  const { data: refData } = await octokit.git.getRef({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    ref: `heads/${branch}`
-  });
-  const commitSha = refData.object.sha;
-  const { data: commitData } = await octokit.git.getCommit({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    commit_sha: commitSha
-  });
-
-  return {
-    commitSha,
-    treeSha: commitData.tree.sha
-  };
-};
-// !!!!!!!!!!
-
-const createNewCommit = async (message, currentTreeSha, currentCommitSha) =>
-  (
-    await octokit.git.createCommit({
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      message,
-      tree: currentTreeSha,
-      parents: [currentCommitSha]
-    })
-  ).data;
-
-const setBranchToCommit = (branch = "master", commitSha) =>
-  octokit.git.updateRef({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    ref: `heads/${branch}`,
-    sha: commitSha
-  });
- */
