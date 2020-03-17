@@ -117,7 +117,7 @@ let newCommit = {};
 async function setAndCreateBranch() {
   console.log("==============setBranch===================");
   currentBranch.name = branchName;
-  await createRef(github.context.payload.pull_request.base.sha);
+  await createRef(github.context.payload.pull_request.head.sha);
 }
 
 async function pushFiles(message, files) {
