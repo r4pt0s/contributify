@@ -178,16 +178,18 @@ const setBranch = async function(owner, repo, branchName) {
 };
 
 const pushFiles = function(message, files) {
-  return getCurrentCommitSHA()
-    .then(getCurrentTreeSHA)
-    .then(() => createFiles(files))
-    .then(createTree)
-    .then(() => createCommit(message))
-    .then(updateHead)
-    .then(createPR)
-    .catch(e => {
-      console.error(e);
-    });
+  return (
+    getCurrentCommitSHA()
+      .then(getCurrentTreeSHA)
+      .then(() => createFiles(files))
+      .then(createTree)
+      .then(() => createCommit(message))
+      //.then(updateHead)
+      .then(createPR)
+      .catch(e => {
+        console.error(e);
+      })
+  );
 };
 
 async function getCurrentCommitSHA() {
