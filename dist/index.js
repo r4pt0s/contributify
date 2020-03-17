@@ -1865,7 +1865,7 @@ async function run(payload) {
     const delRef = await octokit.git.deleteRef({
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,
-      ref: `refs/heads/${github.context.payload.pull_request.head.ref}`
+      ref: `heads/${github.context.payload.pull_request.head.ref}`
     });
     console.log(
       "=============MERGED PR FROM CONTRIBUTIFY BOT=================="
