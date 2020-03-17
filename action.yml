@@ -1,9 +1,10 @@
 name: "Contributify BOT (Github Action)"
-description: "Adds contributor in case of a merged PULL REQUEST to CONTRIBUTORS.md file (on master) automatically"
+author: "Wolfgang Kreminger <r4pt0s@protonmail.com>"
+description: "Adds contributor in case of a merged PULL REQUEST to CONTRIBUTORS.md file (on master) automatically. Doesn't work currently with forks."
+branding:
+  icon: 'user-plus'
+  color: 'blue'
 inputs:
-  workspace: 
-    description: 'Current Repo'
-    required: true
   repo-token:
     description: 'Current Github Token'
     required: true
