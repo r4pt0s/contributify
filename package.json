@@ -22,7 +22,6 @@
     "@actions/github": "^2.1.1",
     "@actions/glob": "^0.1.0",
     "@octokit/rest": "^17.0.1",
-    "dotenv": "^8.2.0",
     "nodegit": "^0.26.5",
     "simple-git": "^1.131.0"
   }

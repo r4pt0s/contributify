@@ -18,14 +18,14 @@ const userToAdd = {
 };
 
 try {
-  run(payload);
+  run();
 } catch (error) {
   core.setFailed(error.message);
 }
 
-async function run(payload) {
+async function run() {
   if (prHeadRef === "contributify") {
-    const delRef = await octokit.git.deleteRef({
+    await octokit.git.deleteRef({
       owner,
       repo,
       ref: `heads/${prHeadRef}`
@@ -33,6 +33,7 @@ async function run(payload) {
     console.log(
       "=============MERGED PR FROM CONTRIBUTIFY BOT=================="
     );
+    console.log("=============DELETED CONTRIBUTIFY BRANCH==================");
     console.log("END");
     return;
   } else {
@@ -40,8 +41,7 @@ async function run(payload) {
   }
 }
 
-//! DONE !!!!!!
-async function checkContributorsFile({ name, htmlUrl }) {
+async function checkContributorsFile({ name }) {
   console.log("____________________________");
 
   const patterns = ["**/CONTRIBUTORS.md"];
@@ -54,7 +54,6 @@ async function checkContributorsFile({ name, htmlUrl }) {
   if (files.length > 0) {
     // file already exists
     console.log("FILE EXISTS", "CHECKING ENTRIES IF USER IS ALREADY IN....");
-    // console.log("=================================");
     isUserInFile = await checkIfContributorExists(name);
     console.log(
       "========================================================================"
@@ -121,17 +120,18 @@ const setAndCreateBranch = async function() {
   await createRef(github.context.payload.pull_request.base.sha);
 };
 
-const pushFiles = function(message, files) {
-  return getCurrentCommitSHA()
-    .then(getCurrentTreeSHA)
-    .then(() => createFiles(files))
-    .then(createTree)
-    .then(() => createCommit(message))
-    .then(updateHead)
-    .then(createPR)
-    .catch(e => {
-      console.error(e);
-    });
+const pushFiles = async function(message, files) {
+  try {
+    await getCurrentCommitSHA();
+    await getCurrentTreeSHA();
+    await createFiles(files);
+    await createTree();
+    await createCommit(message);
+    await updateHead();
+    await createPR();
+  } catch (e) {
+    console.error(e);
+  }
 };
 
 async function getCurrentCommitSHA() {
