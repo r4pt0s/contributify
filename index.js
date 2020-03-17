@@ -114,13 +114,13 @@ let filesToCommit = [];
 let currentBranch = {};
 let newCommit = {};
 
-const setAndCreateBranch = async function() {
+async function setAndCreateBranch() {
   console.log("==============setBranch===================");
   currentBranch.name = branchName;
   await createRef(github.context.payload.pull_request.base.sha);
-};
+}
 
-const pushFiles = async function(message, files) {
+async function pushFiles(message, files) {
   try {
     await getCurrentCommitSHA();
     await getCurrentTreeSHA();
@@ -132,7 +132,7 @@ const pushFiles = async function(message, files) {
   } catch (e) {
     console.error(e);
   }
-};
+}
 
 async function getCurrentCommitSHA() {
   const commitSha = await octokit.git.getRef({
